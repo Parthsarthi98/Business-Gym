@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Dual N-Back</title>
+<style>
+/* System fonts only — this file must work with zero internet access. */
+:root {
+  --paper: #f4efe6;
+  --card: #fbf8f1;
+  --paper-deep: #ebe4d4;
+  --ink: #1a1612;
+  --ink-soft: #3d342a;
+  --rule: #c9bda6;
+  --accent: #b8341b;
+  --red-soft: #f3d2cb;
+  --gold: #a87a1f;
+  --gold-soft: #f0e2bf;
+  --warn: #6e4b00;
+  --green: #2f5d3a;
+  --green-soft: #dbe7dd;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", Roboto, system-ui, sans-serif;
+  line-height: 1.6;
+  -webkit-tap-highlight-color: transparent;
+}
+.serif { font-family: Georgia, "Times New Roman", serif; }
+.mono { font-family: "SF Mono", "Cascadia Code", "Consolas", monospace; }
+
+.nb { max-width: 520px; margin: 0 auto; padding: 24px 16px 80px; }
+.nb kbd {
+  font-family: "SF Mono", "Cascadia Code", "Consolas", monospace;
+  font-size: 11px;
+  padding: 1px 6px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--card);
+  color: var(--ink-soft);
+}
+header.nb-title {
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+}
+header.nb-title h1 {
+  font-family: Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(26px, 7vw, 38px);
+  margin: 0 0 4px;
+}
+header.nb-title h1 em { color: var(--accent); font-style: italic; }
+header.nb-title p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+.nb-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.nb-level { display: flex; align-items: center; gap: 8px; }
+.nb-n {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: Georgia, serif;
+  font-size: 34px;
+  font-weight: 700;
+}
+.nb-n input {
+  width: 1.9em;
+  font: inherit;
+  color: var(--accent);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  text-align: center;
+  padding: 0;
+  -moz-appearance: textfield;
+}
+.nb-n input::-webkit-inner-spin-button, .nb-n input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.nb-n input:focus { outline: none; border-bottom-color: var(--ink); }
+.nb-step {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid var(--rule); background: var(--card);
+  color: var(--ink); font-size: 18px; line-height: 1; cursor: pointer;
+}
+.nb-step:disabled { opacity: .35; cursor: default; }
+.nb-stats {
+  display: flex; gap: 14px;
+  font-family: "SF Mono", "Cascadia Code", "Consolas", monospace;
+  font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--ink-soft);
+}
+.nb-stats b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.nb-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  width: min(100%, 420px); aspect-ratio: 1; margin: 0 auto;
+}
+.nb-cell { border: 1px solid var(--rule); border-radius: 10px; background: var(--card); }
+.nb-cell.nb-centre { border-color: transparent; background: none; position: relative; }
+.nb-cell.nb-centre::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%;
+  background: var(--rule);
+}
+.nb-cell.on { background: var(--ink); border-color: var(--ink); }
+
+.nb-answers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 22px 0 12px; }
+.nb-answer {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  height: 64px; border: 1px solid var(--rule); border-radius: 10px;
+  background: var(--card); color: var(--ink); font: 600 16px inherit;
+  cursor: pointer; touch-action: manipulation; user-select: none;
+  transition: background-color 120ms, border-color 120ms;
+}
+.nb-answer:disabled { opacity: .45; cursor: default; }
+.nb-answer.pressed { border-color: var(--ink-soft); }
+.nb-answer.hit { background: var(--green-soft); border-color: var(--green); color: var(--green); }
+.nb-answer.wrong { background: var(--red-soft); border-color: var(--accent); color: var(--accent); }
+.nb-answer.missed { background: var(--gold-soft); border-color: var(--gold); color: var(--warn); }
+
+.nb-controls { display: flex; justify-content: center; margin-bottom: 24px; }
+.nb-primary {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 11px 26px; border: none; border-radius: 999px;
+  background: var(--ink); color: var(--paper); font: 600 15px inherit; cursor: pointer;
+}
+.nb-primary kbd { background: transparent; border-color: rgba(244,239,230,.35); color: rgba(244,239,230,.8); }
+
+.nb-result { border: 1px solid var(--rule); border-radius: 10px; background: var(--card); padding: 16px; margin-bottom: 24px; }
+.nb-result-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
+.nb-big { font-family: Georgia, serif; font-size: 38px; font-weight: 700; }
+.nb-verdict {
+  font-family: "SF Mono", "Cascadia Code", "Consolas", monospace;
+  font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft);
+}
+.nb-verdict.up, .nb table .up { color: var(--green); }
+.nb-verdict.down, .nb table .down { color: var(--accent); }
+.nb table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.nb th {
+  font-family: "SF Mono", "Cascadia Code", "Consolas", monospace;
+  font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--ink-soft); text-align: right; padding: 4px 0;
+}
+.nb td { text-align: right; padding: 5px 0; border-top: 1px solid var(--paper-deep); }
+.nb th:first-child, .nb td:first-child { text-align: left; }
+
+.nb-settings { border-top: 1px solid var(--rule); padding-top: 14px; }
+.nb-row { display: flex; align-items: center; gap: 12px; min-height: 40px; }
+.nb-label {
+  width: 72px; flex-shrink: 0;
+  font-family: "SF Mono", "Cascadia Code", "Consolas", monospace;
+  font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft);
+}
+.nb-history .nb-label { width: auto; flex: 1; }
+.nb-seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+.nb-seg button { border: none; background: var(--card); color: var(--ink-soft); padding: 6px 12px; font: 500 13px inherit; cursor: pointer; }
+.nb-seg button + button { border-left: 1px solid var(--rule); }
+.nb-seg button.on { background: var(--ink); color: var(--paper); }
+.nb-seg button:disabled:not(.on) { opacity: .5; cursor: default; }
+.nb-link {
+  border: none; background: none; color: #1f5a5e; font: 500 13px inherit;
+  text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 0;
+}
+.nb-link:disabled { opacity: .4; cursor: default; }
+.nb input[type="range"] { flex: 1; max-width: 220px; accent-color: var(--ink); }
+.nb-hint { font-size: 13px; color: var(--ink-soft); margin: 0 0 6px 84px; }
+.nb-help { font-size: 14px; color: var(--ink-soft); border-top: 1px solid var(--rule); margin-top: 14px; padding-top: 6px; }
+.nb-history { border-top: 1px solid var(--rule); margin-top: 8px; padding-top: 6px; }
+@media (max-width: 420px) { .nb-hint { margin-left: 0; } .nb-stats { gap: 10px; } }
+</style>
+</head>
+<body>
+<div class="nb">
+  <header class="nb-title">
+    <h1>Dual <em>N-Back</em></h1>
+    <p>Offline copy · runs entirely in this file, no internet needed</p>
+  </header>
+
+  <header class="nb-head">
+    <div class="nb-level">
+      <button class="nb-step" id="nMinus" aria-label="Lower level">−</button>
+      <label class="nb-n"><span>N</span><input type="number" id="nInput" min="1" max="100" value="2" /></label>
+      <button class="nb-step" id="nPlus" aria-label="Raise level">+</button>
+    </div>
+    <div class="nb-stats">
+      <span>Best <b id="bestStat">2</b></span>
+      <span>Strikes <b id="strikeStat">0/3</b></span>
+      <span>Trial <b id="trialStat">–/22</b></span>
+    </div>
+  </header>
+
+  <div class="nb-grid" id="grid" aria-hidden="true"></div>
+
+  <div class="nb-answers">
+    <button class="nb-answer" id="btnPos" disabled><kbd>A</kbd>Position</button>
+    <button class="nb-answer" id="btnSound" disabled><kbd>L</kbd>Sound</button>
+  </div>
+
+  <div class="nb-controls">
+    <button class="nb-primary" id="startStop">Start N=2 <kbd>Space</kbd></button>
+  </div>
+
+  <div id="resultBox"></div>
+
+  <section class="nb-settings">
+    <div class="nb-row">
+      <span class="nb-label">Sound</span>
+      <div class="nb-seg" id="soundSeg">
+        <button data-v="tones" class="on">Tones</button>
+        <button data-v="letters">Letters</button>
+      </div>
+      <button class="nb-link" id="testSound">Test sound</button>
+    </div>
+    <p class="nb-hint" id="letterHint" style="display:none">
+      Letters (C H K L Q R S T) use your device's speech voice, which can start up to a few hundred
+      milliseconds late. Tones are scheduled on the audio clock and stay exactly in sync with the square.
+    </p>
+    <div class="nb-row">
+      <span class="nb-label">Pace</span>
+      <div class="nb-seg" id="paceSeg">
+        <button data-v="2000">2.0s</button>
+        <button data-v="2500">2.5s</button>
+        <button data-v="3000" class="on">3.0s</button>
+        <button data-v="3500">3.5s</button>
+      </div>
+    </div>
+    <div class="nb-row">
+      <span class="nb-label">Volume</span>
+      <input type="range" id="volume" min="0.2" max="1.5" step="0.05" value="0.9" />
+    </div>
+    <div class="nb-row">
+      <span class="nb-label">Feedback</span>
+      <div class="nb-seg" id="feedbackSeg">
+        <button data-v="on" class="on">On</button>
+        <button data-v="off">Off</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="nb-help">
+    <p>
+      Each trial shows a square and plays a sound at the same moment. Press <kbd>A</kbd> when the square is
+      in the same place as N trials ago, and <kbd>L</kbd> when the sound is the same as N back. Press both if
+      both match. You can answer any time until the next trial starts.
+    </p>
+    <p>
+      A session is 20+N trials, with 6 position and 6 sound matches in the 20 scored ones. Score is
+      hits ÷ (hits + misses + false alarms). 80% or more moves you up a level; under 50% three times in a
+      row moves you down. Levels run from 1 to 100.
+    </p>
+  </section>
+
+  <section class="nb-history" id="historySection" style="display:none">
+    <div class="nb-row">
+      <span class="nb-label">Recent sessions</span>
+      <button class="nb-link" id="resetBtn">Reset</button>
+    </div>
+    <table>
+      <thead><tr><th>Date</th><th>N</th><th>Position</th><th>Sound</th><th>Total</th></tr></thead>
+      <tbody id="historyBody"></tbody>
+    </table>
+  </section>
+</div>
+
+<script>
+"use strict";
+/* ============================== Engine ==============================
+ * Dual N-Back logic: sequence generation, scoring, level rules, and the
+ * audio clock that drives sound + visuals in sync. Ported from the online
+ * version's TypeScript engine into plain JS for a single offline file.
+ * ===================================================================== */
+
+const MIN_N = 1, MAX_N = 100, SCORED_TRIALS = 20, STIMULUS_MS = 500;
+const GRID_CELLS = [0, 1, 2, 3, 5, 6, 7, 8];
+const TONE_FREQS = [440, 523.25, 622.25, 739.99, 880, 1046.5, 1244.51, 1479.98];
+const LETTERS = ["C", "H", "K", "L", "Q", "R", "S", "T"];
+const ADVANCE_PCT = 80, FALLBACK_PCT = 50, FALLBACK_STRIKES = 3;
+
+function randInt(max, rng) { return Math.floor(rng() * max); }
+function randOther(avoid, max, rng) { const v = randInt(max - 1, rng); return v >= avoid ? v + 1 : v; }
+function shuffle(arr, rng) {
+  for (let i = arr.length - 1; i > 0; i--) { const j = randInt(i + 1, rng); [arr[i], arr[j]] = [arr[j], arr[i]]; }
+  return arr;
+}
+
+function generateTrials(n, rng) {
+  rng = rng || Math.random;
+  const kinds = shuffle(
+    [].concat(
+      Array(2).fill("both"),
+      Array(4).fill("pos"),
+      Array(4).fill("sound"),
+      Array(SCORED_TRIALS - 10).fill("none")
+    ), rng
+  );
+  const trials = [];
+  for (let i = 0; i < n + SCORED_TRIALS; i++) {
+    if (i < n) {
+      trials.push({ pos: randInt(8, rng), sound: randInt(8, rng), posMatch: false, soundMatch: false });
+      continue;
+    }
+    const kind = kinds[i - n];
+    const posMatch = kind === "both" || kind === "pos";
+    const soundMatch = kind === "both" || kind === "sound";
+    const back = trials[i - n];
+    trials.push({
+      pos: posMatch ? back.pos : randOther(back.pos, 8, rng),
+      sound: soundMatch ? back.sound : randOther(back.sound, 8, rng),
+      posMatch, soundMatch,
+    });
+  }
+  return trials;
+}
+
+function tally(trials, responses, n, m) {
+  const t = { hits: 0, misses: 0, falseAlarms: 0, correctRejections: 0 };
+  for (let i = n; i < trials.length; i++) {
+    const target = m === "pos" ? trials[i].posMatch : trials[i].soundMatch;
+    const pressed = (responses[i] && responses[i][m]) || false;
+    if (target && pressed) t.hits++;
+    else if (target) t.misses++;
+    else if (pressed) t.falseAlarms++;
+    else t.correctRejections++;
+  }
+  return t;
+}
+function pctOf() {
+  const ts = Array.prototype.slice.call(arguments);
+  const hits = ts.reduce((s, t) => s + t.hits, 0);
+  const denom = ts.reduce((s, t) => s + t.hits + t.misses + t.falseAlarms, 0);
+  return denom === 0 ? 0 : Math.round((hits / denom) * 100);
+}
+function scoreSession(trials, responses, n) {
+  const pos = tally(trials, responses, n, "pos");
+  const sound = tally(trials, responses, n, "sound");
+  return { n, pos, sound, posPct: pctOf(pos), soundPct: pctOf(sound), pct: pctOf(pos, sound), date: new Date().toISOString() };
+}
+function nextLevel(n, strikes, pct) {
+  if (pct >= ADVANCE_PCT) return { n: Math.min(MAX_N, n + 1), strikes: 0 };
+  if (pct < FALLBACK_PCT) {
+    if (strikes + 1 >= FALLBACK_STRIKES) return { n: Math.max(MIN_N, n - 1), strikes: 0 };
+    return { n, strikes: strikes + 1 };
+  }
+  return { n, strikes };
+}
+
+// ---------------------------------------------------------------- audio
+let ctx = null, master = null, buffers = [];
+
+function makeTone(c, freq) {
+  const sr = c.sampleRate, dur = 0.45, len = Math.floor(sr * dur);
+  const buf = c.createBuffer(1, len, sr);
+  const d = buf.getChannelData(0);
+  const attack = 0.006 * sr, release = 0.14 * sr;
+  let peak = 0;
+  for (let i = 0; i < len; i++) {
+    const t = i / sr, w = 2 * Math.PI * freq * t;
+    const s = Math.sin(w) + 0.4 * Math.sin(2 * w) + 0.18 * Math.sin(3 * w) + 0.06 * Math.sin(4 * w);
+    let env = 1;
+    if (i < attack) env = i / attack;
+    else if (i > len - release) env = Math.pow((len - i) / release, 2);
+    d[i] = s * env;
+    peak = Math.max(peak, Math.abs(d[i]));
+  }
+  for (let i = 0; i < len; i++) d[i] = (d[i] / peak) * 0.95;
+  return buf;
+}
+
+async function initAudio(volume) {
+  if (!ctx) {
+    ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: "interactive" });
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -12; comp.knee.value = 6; comp.ratio.value = 4;
+    comp.attack.value = 0.002; comp.release.value = 0.1;
+    master = ctx.createGain();
+    master.connect(comp).connect(ctx.destination);
+    buffers = TONE_FREQS.map((f) => makeTone(ctx, f));
+  }
+  if (ctx.state !== "running") await ctx.resume();
+  setVolume(volume);
+  return ctx;
+}
+function setVolume(v) { if (master && ctx) master.gain.setTargetAtTime(v, ctx.currentTime, 0.01); }
+
+function heardAt(perfMs) {
+  if (perfMs === undefined) perfMs = performance.now();
+  if (!ctx) return 0;
+  const ts = ctx.getOutputTimestamp ? ctx.getOutputTimestamp() : null;
+  if (ts && ts.contextTime && ts.performanceTime) return ts.contextTime + (perfMs - ts.performanceTime) / 1000;
+  const latency = ctx.outputLatency || ctx.baseLatency || 0;
+  return ctx.currentTime - (performance.now() - perfMs) / 1000 - latency;
+}
+function playTone(sound, when) {
+  if (!ctx || !master) return null;
+  const src = ctx.createBufferSource();
+  src.buffer = buffers[sound];
+  src.connect(master);
+  src.start(when);
+  return src;
+}
+
+let voice = null;
+function pickVoice() {
+  const vs = (window.speechSynthesis && window.speechSynthesis.getVoices()) || [];
+  voice = vs.find((v) => v.lang.startsWith("en") && v.localService) || vs.find((v) => v.lang.startsWith("en")) || null;
+}
+if (window.speechSynthesis) {
+  pickVoice();
+  window.speechSynthesis.onvoiceschanged = pickVoice;
+}
+function speakLetter(sound, volume) {
+  const synth = window.speechSynthesis;
+  if (!synth) return;
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(LETTERS[sound]);
+  if (voice) u.voice = voice;
+  u.rate = 1.1;
+  u.volume = Math.min(1, volume);
+  synth.speak(u);
+}
+function previewSound(mode, sound, volume) {
+  if (mode === "letters") speakLetter(sound, volume);
+  else if (ctx) playTone(sound, ctx.currentTime + 0.02);
+}
+
+// ---------------------------------------------------------------- runner
+const LEAD_IN = 0.8, LOOKAHEAD = 0.2;
+
+class Runner {
+  constructor(o) {
+    this.o = o;
+    this.trials = generateTrials(o.n);
+    this.responses = this.trials.map(() => ({ pos: false, sound: false }));
+    this.interval = o.intervalMs / 1000;
+    this.total = this.trials.length;
+    this.t0 = 0;
+    this.scheduled = 0;
+    this.timer = 0;
+    this.raf = 0;
+    this.lastTrial = -2;
+    this.lastVisible = false;
+    this.sources = [];
+    this.stopped = false;
+  }
+  start() {
+    if (!ctx) throw new Error("initAudio first");
+    this.t0 = ctx.currentTime + LEAD_IN;
+    this.schedule();
+    this.timer = window.setInterval(() => this.schedule(), 25);
+    const tick = () => {
+      if (this.stopped) return;
+      this.frame();
+      this.raf = requestAnimationFrame(tick);
+    };
+    this.raf = requestAnimationFrame(tick);
+  }
+  schedule() {
+    if (!ctx || this.o.soundMode !== "tones") return;
+    while (this.scheduled < this.total) {
+      const onset = this.t0 + this.scheduled * this.interval;
+      if (onset > ctx.currentTime + LOOKAHEAD) break;
+      const src = playTone(this.trials[this.scheduled].sound, Math.max(onset, ctx.currentTime));
+      if (src) this.sources.push(src);
+      this.scheduled++;
+    }
+    if (this.sources.length > 4) this.sources = this.sources.slice(-4);
+  }
+  trialAt(heard) { return Math.floor((heard - this.t0) / this.interval); }
+  frame() {
+    const h = heardAt();
+    if (h >= this.t0 + this.total * this.interval) { this.finish(); return; }
+    const k = this.trialAt(h);
+    const visible = k >= 0 && h - (this.t0 + k * this.interval) < STIMULUS_MS / 1000;
+    if (k !== this.lastTrial && k >= 0 && this.o.soundMode === "letters") speakLetter(this.trials[k].sound, this.o.volume);
+    if (k !== this.lastTrial || visible !== this.lastVisible) {
+      this.lastTrial = k; this.lastVisible = visible;
+      this.o.onFrame({ trial: k, visible });
+    }
+  }
+  respond(m, eventTimeMs) {
+    if (this.stopped) return null;
+    const k = this.trialAt(heardAt(eventTimeMs));
+    if (k < this.o.n || k >= this.total) return null;
+    if (this.responses[k][m]) return null;
+    this.responses[k][m] = true;
+    const t = this.trials[k];
+    return { trial: k, correct: m === "pos" ? t.posMatch : t.soundMatch };
+  }
+  finish() { this.halt(); this.o.onDone(scoreSession(this.trials, this.responses, this.o.n)); }
+  halt() {
+    if (this.stopped) return;
+    this.stopped = true;
+    clearInterval(this.timer);
+    cancelAnimationFrame(this.raf);
+    for (const s of this.sources) { try { s.stop(); } catch (e) {} }
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+  }
+}
+
+/* ============================== UI wiring ============================== */
+
+const STORE_KEY = "nback.offline.v1";
+const DEFAULTS = { n: 2, best: 2, strikes: 0, intervalMs: 3000, soundMode: "tones", volume: 0.9, feedback: true, history: [] };
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    return raw ? Object.assign({}, DEFAULTS, JSON.parse(raw)) : Object.assign({}, DEFAULTS);
+  } catch (e) { return Object.assign({}, DEFAULTS); }
+}
+function saveState(s) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) { /* storage unavailable */ }
+}
+
+let s = loadState();
+let runner = null;
+let phase = "idle"; // idle | running | done
+let frame = { trial: -1, visible: false };
+let pressed = { pos: false, sound: false };
+const flashTimers = { pos: 0, sound: 0 };
+
+const $ = (id) => document.getElementById(id);
+const grid = $("grid");
+const btnPos = $("btnPos"), btnSound = $("btnSound");
+const startStop = $("startStop");
+const resultBox = $("resultBox");
+
+function clampN(v) { return Math.max(MIN_N, Math.min(MAX_N, Math.round(v) || MIN_N)); }
+
+function buildGrid() {
+  grid.innerHTML = "";
+  for (let i = 0; i < 9; i++) {
+    const c = document.createElement("div");
+    c.className = "nb-cell" + (i === 4 ? " nb-centre" : "");
+    c.dataset.i = i;
+    grid.appendChild(c);
+  }
+}
+buildGrid();
+
+function render() {
+  $("nInput").value = s.n;
+  $("nMinus").disabled = phase === "running" || s.n <= MIN_N;
+  $("nPlus").disabled = phase === "running" || s.n >= MAX_N;
+  $("nInput").disabled = phase === "running";
+  $("bestStat").textContent = s.best;
+  $("strikeStat").textContent = s.strikes + "/" + FALLBACK_STRIKES;
+
+  const total = s.n + SCORED_TRIALS;
+  $("trialStat").textContent = phase === "running" && frame.trial >= 0
+    ? (frame.trial + 1) + "/" + total
+    : "–/" + total;
+
+  const running = phase === "running";
+  const activeCell = running && frame.visible && runner ? GRID_CELLS[runner.trials[frame.trial].pos] : -1;
+  grid.querySelectorAll(".nb-cell").forEach((c) => {
+    c.classList.toggle("on", Number(c.dataset.i) === activeCell);
+  });
+
+  const canAnswer = running && frame.trial >= s.n;
+  btnPos.disabled = !canAnswer;
+  btnSound.disabled = !canAnswer;
+  btnPos.classList.toggle("pressed", pressed.pos);
+  btnSound.classList.toggle("pressed", pressed.sound);
+
+  if (running) {
+    startStop.innerHTML = 'Stop <kbd>Esc</kbd>';
+  } else {
+    startStop.innerHTML = "Start N=" + s.n + ' <kbd>Space</kbd>';
+  }
+
+  document.querySelectorAll('#soundSeg button').forEach((b) => {
+    b.classList.toggle("on", b.dataset.v === s.soundMode);
+    b.disabled = running;
+  });
+  document.querySelectorAll('#paceSeg button').forEach((b) => {
+    b.classList.toggle("on", Number(b.dataset.v) === s.intervalMs);
+    b.disabled = running;
+  });
+  document.querySelectorAll('#feedbackSeg button').forEach((b) => {
+    b.classList.toggle("on", (b.dataset.v === "on") === s.feedback);
+  });
+  $("volume").value = s.volume;
+  $("letterHint").style.display = s.soundMode === "letters" ? "block" : "none";
+  $("testSound").disabled = running;
+
+  renderHistory();
+}
+
+function renderHistory() {
+  const sec = $("historySection");
+  if (!s.history.length) { sec.style.display = "none"; return; }
+  sec.style.display = "block";
+  $("resetBtn").disabled = phase === "running";
+  const body = $("historyBody");
+  body.innerHTML = "";
+  s.history.slice(0, 12).forEach((h) => {
+    const tr = document.createElement("tr");
+    const d = new Date(h.date);
+    const dateStr = d.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+    const cls = h.pct >= ADVANCE_PCT ? "up" : (h.pct < FALLBACK_PCT ? "down" : "");
+    tr.innerHTML = "<td>" + dateStr + "</td><td>" + h.n + "</td><td>" + h.posPct + "%</td><td>" + h.soundPct + "%</td><td class=\"" + cls + "\">" + h.pct + "%</td>";
+    body.appendChild(tr);
+  });
+}
+
+function showFlash(m, f) {
+  clearTimeout(flashTimers[m]);
+  const btn = m === "pos" ? btnPos : btnSound;
+  btn.classList.remove("hit", "wrong", "missed");
+  if (f) btn.classList.add(f);
+  flashTimers[m] = window.setTimeout(() => { btn.classList.remove("hit", "wrong", "missed"); }, 380);
+}
+
+function update(patch) { Object.assign(s, patch); saveState(s); render(); }
+
+function stop() {
+  if (runner) runner.halt();
+  runner = null;
+  phase = "idle";
+  frame = { trial: -1, visible: false };
+  pressed = { pos: false, sound: false };
+  render();
+}
+
+async function start() {
+  await initAudio(s.volume);
+  if (runner) runner.halt();
+  resultBox.innerHTML = "";
+  pressed = { pos: false, sound: false };
+  let prevTrial = -1;
+  const cur = s;
+  const r = new Runner({
+    n: cur.n,
+    intervalMs: cur.intervalMs,
+    soundMode: cur.soundMode,
+    volume: cur.volume,
+    onFrame: (f) => {
+      if (f.trial !== prevTrial) {
+        const done = prevTrial;
+        if (s.feedback && done >= cur.n && runner) {
+          const t = runner.trials[done];
+          const resp = runner.responses[done];
+          if (t.posMatch && !resp.pos) showFlash("pos", "missed");
+          if (t.soundMatch && !resp.sound) showFlash("sound", "missed");
+        }
+        prevTrial = f.trial;
+        pressed = { pos: false, sound: false };
+      }
+      frame = f;
+      render();
+    },
+    onDone: (res) => {
+      runner = null;
+      const prev = s;
+      const lvl = nextLevel(prev.n, prev.strikes, res.pct);
+      const newHistory = [res].concat(prev.history).slice(0, 50);
+      update({ n: lvl.n, strikes: lvl.strikes, best: Math.max(prev.best, lvl.n), history: newHistory });
+      frame = { trial: -1, visible: false };
+      phase = "done";
+      renderResult(res, prev.n, lvl.n);
+      render();
+    },
+  });
+  runner = r;
+  phase = "running";
+  render();
+  r.start();
+}
+
+function renderResult(r, from, to) {
+  const verdict = to > from ? "Level up: N=" + to : (to < from ? "Level down: N=" + to : "Stay at N=" + to);
+  const vcls = to > from ? "up" : (to < from ? "down" : "");
+  resultBox.innerHTML =
+    '<section class="nb-result">' +
+      '<div class="nb-result-head"><span class="nb-big">' + r.pct + '%</span>' +
+      '<span class="nb-verdict ' + vcls + '">' + verdict + '</span></div>' +
+      '<table><thead><tr><th></th><th>Hits</th><th>Misses</th><th>False alarms</th><th>Score</th></tr></thead>' +
+      '<tbody>' +
+        '<tr><td>Position</td><td>' + r.pos.hits + '</td><td>' + r.pos.misses + '</td><td>' + r.pos.falseAlarms + '</td><td>' + r.posPct + '%</td></tr>' +
+        '<tr><td>Sound</td><td>' + r.sound.hits + '</td><td>' + r.sound.misses + '</td><td>' + r.sound.falseAlarms + '</td><td>' + r.soundPct + '%</td></tr>' +
+      '</tbody></table>' +
+    '</section>';
+}
+
+function respond(m, timeStamp) {
+  if (!runner) return;
+  const res = runner.respond(m, timeStamp);
+  if (!res) return;
+  pressed[m] = true;
+  render();
+  if (s.feedback) showFlash(m, res.correct ? "hit" : "wrong");
+}
+
+// ---- wiring ----
+$("nMinus").addEventListener("click", () => update({ n: clampN(s.n - 1), strikes: 0 }));
+$("nPlus").addEventListener("click", () => update({ n: clampN(s.n + 1), strikes: 0 }));
+$("nInput").addEventListener("change", (e) => update({ n: clampN(Number(e.target.value)), strikes: 0 }));
+
+btnPos.addEventListener("pointerdown", (e) => { e.preventDefault(); respond("pos", e.timeStamp); });
+btnSound.addEventListener("pointerdown", (e) => { e.preventDefault(); respond("sound", e.timeStamp); });
+
+startStop.addEventListener("click", () => { if (phase === "running") stop(); else start(); });
+
+document.getElementById("soundSeg").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b || phase === "running") return;
+  update({ soundMode: b.dataset.v });
+});
+document.getElementById("paceSeg").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b || phase === "running") return;
+  update({ intervalMs: Number(b.dataset.v) });
+});
+document.getElementById("feedbackSeg").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  update({ feedback: b.dataset.v === "on" });
+});
+$("volume").addEventListener("input", (e) => {
+  const v = Number(e.target.value);
+  update({ volume: v });
+  setVolume(v);
+});
+$("testSound").addEventListener("click", async () => {
+  await initAudio(s.volume);
+  previewSound(s.soundMode, Math.floor(Math.random() * 8), s.volume);
+});
+$("resetBtn").addEventListener("click", () => {
+  if (phase === "running") return;
+  if (confirm("Clear history and reset level to 2?")) {
+    update(Object.assign({}, DEFAULTS, { intervalMs: s.intervalMs, soundMode: s.soundMode, volume: s.volume, feedback: s.feedback }));
+  }
+});
+
+window.addEventListener("keydown", (e) => {
+  if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+  const tag = e.target && e.target.tagName;
+  if (tag === "INPUT" || tag === "SELECT") return;
+  const k = e.key.toLowerCase();
+  if (runner) {
+    if (k === "a") respond("pos", e.timeStamp);
+    else if (k === "l") respond("sound", e.timeStamp);
+    else if (k === "escape") stop();
+    else return;
+    e.preventDefault();
+  } else if (k === " " || k === "enter") {
+    e.preventDefault();
+    start();
+  }
+});
+
+document.addEventListener("visibilitychange", () => { if (document.hidden && runner) stop(); });
+
+render();
+</script>
+</body>
+</html>
