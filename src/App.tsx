@@ -47,6 +47,9 @@ export function App() {
           <span>
             Level <b>Tough / Advanced</b>
           </span>
+          <a href="#/n-back">
+            Dual N-Back <b>→</b>
+          </a>
         </div>
       </header>
 

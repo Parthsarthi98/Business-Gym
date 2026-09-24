@@ -6,6 +6,20 @@ day and answer at night. Multiple-choice and quantitative questions are marked
 instantly; written answers are graded by Claude. It saves history and tracks which
 reasoning moves are weakest so future days target them.
 
+## Dual N-Back (`#/n-back`)
+
+A separate trainer page, linked from the Daily Gym header. Levels run from N=1 to
+N=100. Each session is 20+N trials with exactly 6 position and 6 sound matches in the
+20 scored trials. Press `A` for a position match and `L` for a sound match (or tap the
+buttons). Scoring is hits ÷ (hits + misses + false alarms): 80% or more moves you up a
+level, and under 50% three sessions in a row moves you down. Level, settings and the
+last 50 sessions are saved in the browser.
+
+Sync: the Web Audio clock drives everything. Tones are scheduled on it
+sample-accurately, the square is drawn when that clock (corrected for speaker latency)
+reaches each trial, and key presses are mapped to trials on the same clock. The
+optional "Letters" mode uses the device's speech voice, which can start slightly late.
+
 ## Stack
 
 - React frontend (Vite), built to match the parchment design in the brief.
