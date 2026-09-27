@@ -38,3 +38,6 @@ Average 6.0. **Dissent:** the VC blocks further capital until there is a partner
 
 ## 7. Board and blind spot
 D2C buyer, sceptical VC, platform product head, legal and fraud expert (added at your request). No web research was run: round 1 had it switched on but no member searched, and you turned it off for later rounds. All competitor and legal claims are the members' judgement. Blind spots: no one represented the end consumer, and no one covered expansion outside India, which the unicorn goal now depends on.
+
+## Addendum: research check (after the run)
+A research-enabled re-run of the platform head found that Indian order and shipping platforms already sell returns management, which supports the "feature, not company" concern. It also found that the Consumer Protection (E-Commerce) (Amendment) Rules 2026 take effect on 1 January 2027, requiring 48-hour acknowledgement and one-month resolution of complaints. That gives a timing reason to buy now. See `research-test.md`.
