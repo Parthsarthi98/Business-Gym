@@ -16,8 +16,13 @@
 
 **Seat 3: Expert on the highest-risk dimension. Head of Product at an Indian e-commerce enablement platform (shipping, returns and post-purchase stack serving 50,000+ sellers).** Could ship this as a feature to an existing base. Optimises for attach rate across the seller base, low marginal cost and sticky bundles. Rejects standalone tools that depend on data the platform already owns. Frameworks: feature versus product versus platform test, integration surface and data gravity, partner or compete mapping.
 
+**Seat 4 (added at author's request): Legal, regulatory and fraud. Partner at a Mumbai technology and consumer-law practice, formerly head of fraud risk and compliance at a large Indian payments firm.** Advises e-commerce and fintech clients on the DPDP Act, the Consumer Protection (E-Commerce) Rules, RBI refund timelines and grievance-officer duties. Has run refund-abuse and fraud-ring investigations. Optimises for lawful data use, defensible automated decisions and low fraud loss. Rejects cross-merchant claimant profiling without valid consent, opaque automated rejections with no appeal, and unclear liability. Frameworks: DPDP consent and purpose limitation, fraud loss versus false-positive cost, liability allocation in contracts.
+
 ## Runner-up
-Head of Trust and Safety and refunds operations at a large Indian quick-commerce firm (fraud rings, refund abuse, liability for wrong decisions).
+Head of Trust and Safety at a large Indian quick-commerce firm. Largely covered now by seat 4.
 
 ## Blind spot
-Legal and regulatory: DPDP Act consent for cross-merchant claimant profiling, Consumer Protection (E-Commerce) Rules on grievance handling, and liability when an automated rejection is wrong. Also no one represents the end consumer directly.
+No one represents the end consumer directly, and no one covers global expansion go-to-market (US or Southeast Asia buyers).
+
+## Run settings
+Board size 4. Research on (up to 2 web searches per member in round 1).
