@@ -79,11 +79,30 @@ export interface Rubric {
   ethicsPenalty: string;
 }
 
+export type ProfileId = "standard" | "saver";
+type Effort = "low" | "medium" | "high" | "xhigh" | "max";
+
+/** A cost setting for API calls: which models play buyer and coach, and which speech-to-text runs. */
+export interface CostProfile {
+  label: string;
+  description: string;
+  buyerModel: string;
+  buyerEffort: Effort;
+  coachModel: string;
+  coachEffort: Effort;
+  stt: "deepgram" | "browser";
+  estimatePerHourUsd: number;
+  estimatePerHourInr: number;
+}
+
 export interface Settings {
-  models: { buyer: string; buyerEffort: "low" | "medium" | "high"; coach: string; coachEffort: "low" | "medium" | "high" | "xhigh" | "max" };
+  profiles: Record<ProfileId, CostProfile>;
+  defaultProfile: ProfileId;
   voice: {
     sttModel: string;
     sttLanguage: string;
+    /** Language for the phone's built-in speech recognition (Saver profile). */
+    browserSttLanguage: string;
     endpointingMs: number;
     utteranceEndMs: number;
     ttsModel: string;
@@ -128,6 +147,7 @@ export interface BuyerRequest {
   difficulty: { level: number; name: string; description: string };
   /** Neutral summaries of earlier calls between this rep and this buyer, oldest first. */
   memory: { date: string; summary: string }[];
+  profile: ProfileId;
   turns: Turn[];
   /** Set when the rep has talked past the buyer's patience and the buyer should cut in. */
   cutIn?: { secondsTalking: number };
@@ -156,6 +176,7 @@ export interface CoachReport {
 }
 
 export interface CoachRequest {
+  profile: ProfileId;
   buyer: Buyer;
   scenario: Scenario;
   method: Method;
@@ -176,6 +197,7 @@ export interface RetryReport {
 }
 
 export interface RetryRequest {
+  profile: ProfileId;
   method: Method;
   product: Product;
   buyer: Buyer;
@@ -190,12 +212,16 @@ export interface CallRecord {
   startedAt: string;
   durationSec: number;
   setup: CallSetup;
-  mode: "voice" | "text";
+  /** voice/text: run by this app through the API. claude-app: practised free in the Claude app and logged here. */
+  mode: "voice" | "text" | "claude-app";
+  profile?: ProfileId;
   difficultyLevel: number;
   turns: Turn[];
   outcome: CallOutcome;
   nextStep?: string;
   report?: CoachReport;
+  /** Claude-app sessions: the transcript as pasted (turns is empty). */
+  rawTranscript?: string;
   /** Set when this call is a replay of one moment from another call. */
   replayOf?: string;
   retryReport?: RetryReport;

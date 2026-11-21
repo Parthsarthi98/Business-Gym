@@ -4,6 +4,9 @@
 
 import type { BuyerRequest, CoachRequest, Product, RetryRequest, Turn } from "./types";
 
+/** The parts of a buyer request that define the persona (no transcript). */
+export type BuyerPersonaInput = Pick<BuyerRequest, "buyer" | "scenario" | "product" | "difficulty" | "memory">;
+
 const list = (items: string[] | undefined) => (items && items.length ? items.map((i) => `- ${i}`).join("\n") : "- (none)");
 
 export function productFacts(p: Product): string {
@@ -25,7 +28,8 @@ export function productFacts(p: Product): string {
 
 // ---------------------------------------------------------------- buyer
 
-export function buyerSystemPrompt(r: BuyerRequest): string {
+/** channel "app": this app's voice pipeline, with markers. "claude-app": pasted into Claude's own voice mode. */
+export function buyerSystemPrompt(r: BuyerPersonaInput, channel: "app" | "claude-app" = "app"): string {
   const b = r.buyer;
   const memory = r.memory.length
     ? r.memory.map((m) => `- ${m.date}: ${m.summary}`).join("\n") +
@@ -76,14 +80,36 @@ Level ${r.difficulty.level} (${r.difficulty.name}): ${r.difficulty.description}
 - Punish manipulation: invented urgency, fake scarcity, pretexts, made-up numbers or customers, pressure after you said no. Call it out in your own words, get colder, and end the call if it continues.
 - You may decline a next step, and you may end the call early. A clear "no" is a valid ending.
 - Stay in character at all times. Never mention being an AI, a simulation, a practice room, a method, or a score. If the rep asks you for coaching, react as ${b.name} would.
+${channel === "claude-app" ? claudeAppRules(r) : appRules(b.name)}`;
+}
 
+function appRules(name: string): string {
+  return `
 # Spoken output only
-Everything you write is converted to speech. Write only the words ${b.name} says out loud: usually one to three short sentences, natural spoken English with contractions. No stage directions, no asterisks, no lists, no emoji, no quotation marks around your words.
+Everything you write is converted to speech. Write only the words ${name} says out loud: usually one to three short sentences, natural spoken English with contractions. No stage directions, no asterisks, no lists, no emoji, no quotation marks around your words.
 
 # Markers (never spoken; the app reads and removes them)
 - Begin every reply with your current mood in one word, like [mood: skeptical] or [mood: warming].
 - If you agree to a specific next step, finish that reply with [NEXT STEP: short description of what was agreed].
 - If you end the call, say your last words and then write [END CALL]. Use it only when you actually hang up.`;
+}
+
+function claudeAppRules(r: BuyerPersonaInput): string {
+  const b = r.buyer;
+  const opening = r.scenario.buyerOpensCall
+    ? `When I say "start", answer the phone with exactly: "${b.phoneGreeting}" Then wait for me.`
+    : `When I say "start", say only "Ready." and wait for me to speak first.`;
+  return `
+# Spoken output only
+We are using voice mode, so everything you say is spoken aloud. Say only the words ${b.name} says: usually one to three short sentences, natural spoken English. Never describe actions, never use lists or headings, never add notes, summaries or advice. Never step out of the role to comment on how I am doing.
+
+# Running the call
+- ${opening}
+- If you agree to a specific next step, say clearly what was agreed, in ${b.name}'s words.
+- If you end the call, say your last words and then say "Call ended." After that, answer anything I say with only "Call ended."
+- If I say "end call", say only "Call ended."
+- Do not give feedback after the call, even if asked. A separate coach reviews it.
+- After the call has ended, if I type the single word TRANSCRIPT, step out of the role once and write the whole conversation as a plain transcript: one line per turn, starting "REP:" for my words and "BUYER:" for yours, word for word as spoken, with no commentary.`;
 }
 
 /** Turns the transcript into alternating Messages API turns. */
@@ -148,18 +174,14 @@ Principles:
 - Be direct and fair. No praise padding, no hype, no metaphors.`;
 }
 
-export function coachUserPrompt(r: CoachRequest): string {
+type CoachContext = Pick<CoachRequest, "buyer" | "scenario" | "method" | "otherMethods" | "product" | "rubric">;
+
+function coachBody(r: CoachContext, outcome: string, transcript: string): string {
   const m = r.method;
   const crit = (Object.keys(m.coachCriteria) as (keyof typeof m.coachCriteria)[])
     .map((k) => `${k}:\n${list(m.coachCriteria[k])}`)
     .join("\n");
   const others = r.otherMethods.map((o) => `- ${o.id} (${o.name}): ${o.coreMoves.slice(0, 3).join(" ")}`).join("\n");
-  const outcome =
-    r.outcome === "won"
-      ? `The buyer agreed to a next step: ${r.nextStep}.`
-      : r.outcome === "buyer-ended"
-        ? "The buyer ended the call without agreeing a next step."
-        : "The rep ended the call without a next step being agreed.";
 
   return `# Method the rep chose to practise: ${m.name}
 Core moves:
@@ -193,22 +215,79 @@ ${list(r.buyer.withholds)}
 Use this to point out what good discovery would have uncovered.
 
 # Outcome
-${outcome} Call length: ${Math.round(r.durationSec)} seconds.
+${outcome}
 
 # Other methods in the library (for the "alternative method" field; pick one that is not ${m.id})
 ${others}
 
-# Transcript (turn numbers start at #0)
-${transcriptText(r.turns)}
+# Transcript
+${transcript}`;
+}
 
-# What to produce
-- phases: score opener, discovery, objectionHandling and close out of 10 against the method's criteria, each with reached (true/false) and a one-sentence reason.
+const WHAT_TO_PRODUCE = `- phases: score opener, discovery, objectionHandling and close out of 10 against the method's criteria, each with reached (true/false) and a one-sentence reason.
 - overall: two plain sentences on the most important pattern in this call.
 - moments: two to four specific rep moments, each with the rep's exact quote, what happened, and better wording.
 - weakestMoment: the single rep turn that cost the most. Give its turn number, the rep's quote, the buyer line just before it (empty if none), why it matters, and a rewrite of exactly what the rep should have said instead.
 - ethicsFlags: every deceptive or manipulative move, with an honest alternative. Empty list if none.
 - alternativeMethod: one other method from the list, and what it would have tried at the weakest moment, in one or two sentences.
 - factualSummary: two or three neutral sentences of facts only (what the rep proposed or claimed, what the buyer said about their situation, what was agreed or declined). No judgement. It will be given to the buyer as their memory of this call.`;
+
+export function coachUserPrompt(r: CoachRequest): string {
+  const outcome =
+    r.outcome === "won"
+      ? `The buyer agreed to a next step: ${r.nextStep}.`
+      : r.outcome === "buyer-ended"
+        ? "The buyer ended the call without agreeing a next step."
+        : "The rep ended the call without a next step being agreed.";
+  const transcript = `(turn numbers start at #0)\n${transcriptText(r.turns)}`;
+  return `${coachBody(r, `${outcome} Call length: ${Math.round(r.durationSec)} seconds.`, transcript)}
+
+# What to produce
+${WHAT_TO_PRODUCE}`;
+}
+
+/**
+ * A self-contained coach prompt to paste into a fresh Claude chat, for a call practised in
+ * Claude's voice mode. It ends with a JSON block that Practice Room imports to track progress.
+ */
+export function claudeAppCoachPrompt(r: CoachContext, rawTranscript: string): string {
+  return `${coachSystemPrompt()}
+
+Below is everything you need to review one practice call. The call took place in a separate chat, in which Claude played the buyer. In the transcript, the rep is the human (they may be labelled "You", "User" or by name) and the buyer is the AI.
+
+${coachBody(
+    r,
+    `Decide the outcome from the transcript: "won" if the buyer clearly agreed to a specific next step, "buyer-ended" if the buyer ended the call without one, "rep-ended" otherwise.`,
+    rawTranscript.trim(),
+  )}
+
+# What to produce
+First, write the debrief for the rep in plain language: the four scores with one-line reasons, the weakest moment with your rewrite, any ethics flags, two to four moments to rework, and what another method would have tried.
+
+Then, at the very end, give the same content as one JSON code block (fenced with \`\`\`json) so the rep's app can record it. Use exactly these keys:
+${WHAT_TO_PRODUCE.replace("Give its turn number,", "Set turnIndex to -1 (there are no turn numbers),")}
+- outcome: "won", "buyer-ended" or "rep-ended".
+- nextStep: what was agreed, or an empty string.
+
+Shape of the JSON (replace every value):
+\`\`\`json
+{
+  "outcome": "rep-ended",
+  "nextStep": "",
+  "phases": {
+    "opener": { "score": 0, "reached": true, "reason": "" },
+    "discovery": { "score": 0, "reached": true, "reason": "" },
+    "objectionHandling": { "score": 0, "reached": false, "reason": "" },
+    "close": { "score": 0, "reached": true, "reason": "" }
+  },
+  "overall": "",
+  "moments": [{ "quote": "", "whatHappened": "", "betterWording": "" }],
+  "weakestMoment": { "turnIndex": -1, "quote": "", "buyerLineBefore": "", "whyItMatters": "", "rewrite": "" },
+  "ethicsFlags": [],
+  "alternativeMethod": { "methodId": "", "whatItWouldTry": "" },
+  "factualSummary": ""
+}
+\`\`\``;
 }
 
 export function retryUserPrompt(r: RetryRequest): string {

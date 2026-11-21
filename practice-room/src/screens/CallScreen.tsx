@@ -40,6 +40,7 @@ export function CallScreen({ plan, calls, onExit, onFinished, onSwitchToText }: 
       scenario,
       product: getProduct(plan.setup.productId),
       mode: plan.mode,
+      profile: plan.profile,
       difficulty: settings.difficulty.levels[level - 1],
       memory: buyerMemory(calls, buyer.id),
       seedTurns,
@@ -52,6 +53,7 @@ export function CallScreen({ plan, calls, onExit, onFinished, onSwitchToText }: 
           durationSec: r.durationSec,
           setup: plan.setup,
           mode: plan.mode,
+          profile: plan.profile,
           difficultyLevel: level,
           turns: r.turns,
           outcome: r.outcome,
@@ -63,6 +65,7 @@ export function CallScreen({ plan, calls, onExit, onFinished, onSwitchToText }: 
           if (retryTurns.some((t) => t.speaker === "rep")) {
             try {
               record.retryReport = await requestRetryReview({
+                profile: plan.profile,
                 method: getMethod(plan.setup.methodId),
                 product: getProduct(plan.setup.productId),
                 buyer,

@@ -7,6 +7,37 @@ moment.
 
 This is a practice room only: no outbound calling, no real prospects, no telephony.
 
+## Three practice modes
+
+Pick one on the Call screen.
+
+| Mode | Cost | Buyer | Coach | Hears you with |
+|---|---|---|---|---|
+| **Standard** | about $2.15 (₹190) an hour, paid to the APIs | Claude Sonnet 5.5 | Claude Opus 5.5 | Deepgram |
+| **Saver** | about $0.85 (₹75) an hour | Claude Haiku 5.5 (may go a little easier on you) | Claude Sonnet 5.5 | your phone's free built-in speech recognition |
+| **Free** | nothing extra: uses your Claude plan's usage | Claude, in the Claude app's voice mode | Claude, in a separate fresh chat | the Claude app |
+
+Standard and Saver run inside this app, with interruptions both ways, a buyer voice from
+Sarvam, and automatic scoring. Free mode runs the call in the Claude app instead; this app
+gives you the prompts and records the coach's scores, so your progress stays in one place.
+
+A sensible routine: most days in Free mode, and Standard or Saver a few times a week for the
+calls where interruptions and automatic scoring matter.
+
+### Free mode, step by step
+
+1. On the Call screen choose **Free**, pick a buyer, scenario and method, and tap **Start free
+   session in Claude**.
+2. Copy the buyer prompt, paste it as the first message of a new Claude chat, turn on voice
+   mode and say "start". Say "end call" when done.
+3. Leave voice mode and type `TRANSCRIPT`. Claude writes out the call. Paste it into the app.
+4. Copy the coach prompt (it already contains your transcript) into a **new** Claude chat, so
+   the coach judges the call cold.
+5. Paste the coach's whole reply back into the app. The app reads the JSON block at the end
+   and saves the scores, the outcome and a memory note for the buyer's next call.
+
+The app keeps your place if the phone reloads it while you are in the Claude app.
+
 ## How it works
 
 ```
@@ -61,8 +92,15 @@ Estimate per hour of practice (six 10-minute calls, the buyer speaking about a t
 | Claude coach (six reviews) | about $0.75 (₹66) |
 | **Total** | **about $2.15 (₹190); range $1.70–2.80** |
 
-Monthly: 5 hours ≈ $11 (₹950); 15 hours, i.e. 30 minutes a day ≈ $32 (₹2,850); 30 hours,
-i.e. an hour a day ≈ $65 (₹5,700). Rupee figures assume about ₹88 to the dollar. Check each
+That table is the **Standard** mode. **Saver** is about $0.85 (₹75) an hour: no Deepgram,
+the Haiku buyer costs about $0.04 an hour, the Sonnet coach about $0.30, and Sarvam stays at
+about ₹42. **Free** mode adds nothing beyond your Claude plan.
+
+| Hours a month | Standard | Saver |
+|---|---|---|
+| 5 | ≈ $11 (₹950) | ≈ $4 (₹375) |
+| 15 (30 minutes a day) | ≈ $32 (₹2,850) | ≈ $13 (₹1,125) |
+| 30 (an hour a day) | ≈ $65 (₹5,700) | ≈ $26 (₹2,250) | Rupee figures assume about ₹88 to the dollar. Check each
 vendor's pricing page; these figures come from public pricing in November 2026.
 
 ## Set up
@@ -72,7 +110,7 @@ You need four values. Never commit them.
 | Name | Where to get it |
 |---|---|
 | `ANTHROPIC_API_KEY` | console.anthropic.com → API keys |
-| `DEEPGRAM_API_KEY` | console.deepgram.com → API keys. Give it the **Member** role or higher, so it can mint short-lived browser tokens. |
+| `DEEPGRAM_API_KEY` | console.deepgram.com → API keys. Give it the **Member** role or higher, so it can mint short-lived browser tokens. Needed for Standard mode only. |
 | `SARVAM_API_KEY` | dashboard.sarvam.ai → API keys |
 | `APP_ACCESS_CODE` | A passphrase you choose. The app asks for it once per device. It stops anyone who finds your URL from spending your credit. |
 
@@ -109,7 +147,7 @@ Everything the buyer, coach and progress logic uses is plain JSON in `data/`. Ru
 | `data/scenarios/*.json` | The seven scenarios: briefs for you and the buyer, default methods, win condition |
 | `data/products/*.json` | Product briefs. The shipped one, Shiftwise, is fictional |
 | `data/rubric.json` | Phases, score anchors, ethics rules and the ethics score cap |
-| `data/settings.json` | Models, effort, speech settings, call limits, difficulty rules |
+| `data/settings.json` | The Standard and Saver modes (models, effort, speech-to-text, cost estimates), speech settings, call limits, difficulty rules |
 
 To practise with a real product, paste its brief in **Settings → Your product**. Include
 pricing, proof points and limitations: the coach treats any claim outside the brief as
@@ -129,7 +167,10 @@ voice and the call screen says so; replace the ID with one from Sarvam's Voices 
 | `api/stt-token.ts` | Mints a 60-second Deepgram token so the real key never reaches the browser |
 | `api/tts.ts` | Sends one sentence to Sarvam and streams the MP3 audio back |
 | `api/status.ts` | Reports which keys are configured (never their values) |
-| `shared/prompts.ts` | The buyer and coach prompts |
+| `shared/prompts.ts` | The buyer and coach prompts, including the Free-mode versions for the Claude app |
+| `api/_models.ts` | Per-model request options (how thinking is turned off, refusal fallbacks) |
+| `src/screens/ClaudeAppSession.tsx` | Free mode: prompts to copy, and importing the coach's scores |
+| `src/voice/browserStt.ts` | The phone's built-in speech recognition (Saver mode) |
 | `src/call/engine.ts` | Turn-taking, barge-in, buyer cut-in, end-call detection |
 | `src/voice/` | Microphone capture, Deepgram socket, sentence splitting, audio queue |
 | `src/lib/progress.ts` | Scores over time, buyer levels, buyer memory, next drill |
@@ -142,6 +183,13 @@ with a fake microphone and a simulated Deepgram socket. The simulated voice test
 audio streaming, barge-in, the echo filter, the cut-off transcript, the buyer cutting in at
 30 seconds, "end call", and the failure path when voice cannot start.
 
+Also tested with simulated services: Saver mode (simulated phone speech recognition,
+restarts after silence, barge-in), the Free-mode flow (prompts, reload recovery, a wrong paste,
+importing scores, buyer memory), and the exact model settings each mode sends to Claude.
+
 Not yet tested with the real services: actual speech recognition quality, real
 text-to-speech, true end-to-end delay, echo on a phone speaker, and the first Vercel deploy.
-Wearing earphones avoids most echo problems.
+Also untested: how Claude's voice mode handles the
+buyer prompt (it has its own voice-mode behaviour), and the phone's built-in speech recognition
+on iPhone Safari, which is less reliable than on Android Chrome. Wearing earphones avoids most
+echo problems.

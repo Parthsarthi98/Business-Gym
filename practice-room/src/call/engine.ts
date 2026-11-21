@@ -1,6 +1,6 @@
 // The live call: turn-taking, the buyer's streamed reply, sentence-chunked speech, and
 // interruptions both ways (you can talk over the buyer; the buyer cuts in if you ramble).
-import type { Buyer, BuyerRequest, CallOutcome, Product, Scenario, Turn } from "../../shared/types";
+import type { Buyer, BuyerRequest, CallOutcome, Product, ProfileId, Scenario, Turn } from "../../shared/types";
 import { MarkerStreamParser } from "../../shared/markers";
 import { fetchSpeech, getSttToken, streamBuyer } from "../lib/api";
 import { settings } from "../lib/library";
@@ -8,6 +8,7 @@ import { Mic } from "../voice/mic";
 import { SentenceChunker } from "../voice/sentences";
 import { SpeechQueue } from "../voice/player";
 import { DeepgramStream } from "../voice/stt";
+import { BrowserStt } from "../voice/browserStt";
 
 export type Link = "connecting" | "live" | "text-demo" | "lost";
 export type Activity = "idle" | "listening" | "rep-speaking" | "buyer-thinking" | "buyer-speaking";
@@ -38,6 +39,7 @@ export interface EngineOptions {
   scenario: Scenario;
   product: Product;
   mode: "voice" | "text";
+  profile: ProfileId;
   difficulty: BuyerRequest["difficulty"];
   memory: BuyerRequest["memory"];
   /** Replay: the conversation up to the moment being retried. */
@@ -62,7 +64,7 @@ export class CallEngine {
   private o: EngineOptions;
   private ctx: AudioContext | null = null;
   private mic: Mic | null = null;
-  private stt: DeepgramStream | null = null;
+  private stt: DeepgramStream | BrowserStt | null = null;
   private queue: SpeechQueue | null = null;
   private timer: number | undefined;
   private startTime = 0;
@@ -111,26 +113,36 @@ export class CallEngine {
 
   async start(ctx: AudioContext | null) {
     this.startTime = performance.now();
+    this.o.onChange(this.state); // show the call screen (with "Connecting voice…") straight away
     const seed = this.state.turns;
     this.timeOffset = seed.length ? seed[seed.length - 1].at + 1000 : 0;
 
     if (this.o.mode === "voice") {
       if (!ctx) return this.fail("Audio is not available in this browser.");
       this.ctx = ctx;
+      const events = {
+        onInterim: (t: string) => this.onInterim(t),
+        onFinal: (t: string, sf: boolean) => this.onFinal(t, sf),
+        onUtteranceEnd: () => this.commitRepTurn(),
+        onClose: (unexpected: boolean, reason: string) => {
+          if (unexpected && this.state.status === "active") this.linkLost(`Speech-to-text disconnected (${reason}).`);
+        },
+      };
       try {
-        const token = await getSttToken();
-        this.stt = await DeepgramStream.open(token, ctx.sampleRate, settings.voice, {
-          onInterim: (t) => this.onInterim(t),
-          onFinal: (t, sf) => this.onFinal(t, sf),
-          onUtteranceEnd: () => this.commitRepTurn(),
-          onClose: (unexpected, reason) => {
-            if (unexpected && this.state.status === "active") this.linkLost(`Speech-to-text disconnected (${reason}).`);
-          },
-        });
-        this.mic = await Mic.start(ctx, (pcm) => this.stt?.send(pcm));
+        if (settings.profiles[this.o.profile].stt === "browser") {
+          // The phone's own recognition captures the microphone itself; no audio streaming needed.
+          this.stt = await BrowserStt.open(settings.voice.browserSttLanguage, events);
+        } else {
+          const token = await getSttToken();
+          this.stt = await DeepgramStream.open(token, ctx.sampleRate, settings.voice, events);
+          this.mic = await Mic.start(ctx, (pcm) => this.stt?.send(pcm));
+        }
       } catch (e) {
+        if (this.state.status === "ended") return this.cleanup();
         return this.fail(`Live voice could not start: ${(e as Error).message}`);
       }
+      // You hung up while voice was still connecting.
+      if (this.state.status === "ended") return this.cleanup();
       let warnedVoice = false;
       const onVoiceFallback = (id: string) => {
         if (warnedVoice) return;
@@ -168,6 +180,8 @@ export class CallEngine {
   private linkLost(reason: string) {
     this.mic?.stop();
     this.mic = null;
+    this.stt?.close();
+    this.stt = null;
     this.set({
       link: "lost",
       notice: `${reason} Live voice has stopped. You can keep going by typing, or end the call.`,
@@ -356,6 +370,7 @@ export class CallEngine {
       product: this.o.product,
       difficulty: this.o.difficulty,
       memory: this.o.memory,
+      profile: this.o.profile,
       turns: this.state.turns,
       cutIn,
     };

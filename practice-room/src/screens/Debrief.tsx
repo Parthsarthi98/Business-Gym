@@ -5,9 +5,10 @@ import type { ServerStatus } from "../lib/api";
 import { requestCoach, requestRetryReview } from "../lib/api";
 import { getBuyer, getMethod, getProduct, getScenario, methods, rubric } from "../lib/library";
 import { PHASES, weakestTurnIndex } from "../lib/progress";
-import { deleteCall, getCall, saveCall } from "../lib/storage";
+import { deleteCall, getCall, loadProfile, saveCall } from "../lib/storage";
 import { unlockAudio } from "../call/engine";
 import { fmtTime, OUTCOME_LABEL, ScoreBar } from "../components";
+import { voiceReadiness } from "../lib/readiness";
 
 interface Props {
   callId: string;
@@ -36,6 +37,7 @@ export function Debrief({ callId, status, onClose, onChanged, onStartPlan }: Pro
         c = {
           ...c,
           retryReport: await requestRetryReview({
+            profile: c.profile ?? "standard",
             method: getMethod(c.setup.methodId),
             product: getProduct(c.setup.productId),
             buyer: getBuyer(c.setup.buyerId),
@@ -48,6 +50,7 @@ export function Debrief({ callId, status, onClose, onChanged, onStartPlan }: Pro
         c = {
           ...c,
           report: await requestCoach({
+            profile: c.profile ?? "standard",
             buyer: getBuyer(c.setup.buyerId),
             scenario: getScenario(c.setup.scenarioId),
             method,
@@ -91,13 +94,14 @@ export function Debrief({ callId, status, onClose, onChanged, onStartPlan }: Pro
   const allWords = call.turns.reduce((n, t) => n + t.text.split(/\s+/).length, 0) || 1;
   const cutIns = call.turns.filter((t) => t.cutIn).length;
   const interruptions = call.turns.filter((t) => t.interrupted).length;
-  const repSpoke = call.turns.some((t) => t.speaker === "rep");
+  const claudeApp = call.mode === "claude-app";
+  const repSpoke = claudeApp || call.turns.some((t) => t.speaker === "rep");
   const canReplay = r && weakestTurnIndex(call) !== null && status.anthropic;
 
   const replay = (mode: "voice" | "text") =>
-    onStartPlan({ setup: call.setup, mode, audio: mode === "voice" ? unlockAudio() : null, replayOf: call });
-  const again = (mode: "voice" | "text") => onStartPlan({ setup: call.setup, mode, audio: mode === "voice" ? unlockAudio() : null });
-  const voiceReady = status.anthropic && status.deepgram && status.sarvam;
+    onStartPlan({ setup: call.setup, mode, profile: loadProfile(), audio: mode === "voice" ? unlockAudio() : null, replayOf: call });
+  const again = (mode: "voice" | "text") => onStartPlan({ setup: call.setup, mode, profile: loadProfile(), audio: mode === "voice" ? unlockAudio() : null });
+  const voiceReady = voiceReadiness(status, loadProfile()).ready;
 
   return (
     <div className="debrief screen">
@@ -110,8 +114,11 @@ export function Debrief({ callId, status, onClose, onChanged, onStartPlan }: Pro
 
       <h1>{call.replayOf ? "Replay review" : "Coach's debrief"}</h1>
       <p className="muted">
-        {buyer.name} · {scenario.name} · {method.name} · {fmtTime(call.durationSec * 1000)} · {call.mode === "voice" ? "voice" : "text demo"} · level{" "}
-        {call.difficultyLevel}
+        {buyer.name} · {scenario.name} · {method.name} ·{" "}
+        {claudeApp
+          ? "Claude app"
+          : `${fmtTime(call.durationSec * 1000)} · ${call.mode === "voice" ? "voice" : "text demo"} · ${call.profile === "saver" ? "Saver" : "Standard"}`}{" "}
+        · level {call.difficultyLevel}
       </p>
 
       <div className={`outcome outcome-${call.outcome}`}>
@@ -224,37 +231,49 @@ export function Debrief({ callId, status, onClose, onChanged, onStartPlan }: Pro
         </>
       )}
 
+      {!claudeApp && (
+        <>
       <section className="card stats">
-        <div>
-          <b>{Math.round((repWords / allWords) * 100)}%</b>
-          <span>your share of words</span>
-        </div>
-        <div>
-          <b>{cutIns}</b>
-          <span>times the buyer cut in</span>
-        </div>
-        <div>
-          <b>{interruptions}</b>
-          <span>times you cut the buyer off</span>
-        </div>
-      </section>
-
-      <button className="text-btn" onClick={() => setShowTranscript((s) => !s)}>
-        {showTranscript ? "Hide transcript" : "Show transcript"}
-      </button>
-      {showTranscript && (
-        <div className="transcript card">
-          {call.turns.map((t, i) => (
-            <p key={i} className={t.speaker}>
-              <span className="who">
-                {fmtTime(t.at)} {t.speaker === "rep" ? "You" : buyer.name.split(" ")[0]}
-                {t.cutIn ? " (cut in)" : ""}
-              </span>
-              {t.text}
-              {t.interrupted ? " —" : ""}
-            </p>
-          ))}
-        </div>
+          <div>
+            <b>{Math.round((repWords / allWords) * 100)}%</b>
+            <span>your share of words</span>
+          </div>
+          <div>
+            <b>{cutIns}</b>
+            <span>times the buyer cut in</span>
+          </div>
+          <div>
+            <b>{interruptions}</b>
+            <span>times you cut the buyer off</span>
+          </div>
+        </section>
+  
+        <button className="text-btn" onClick={() => setShowTranscript((s) => !s)}>
+          {showTranscript ? "Hide transcript" : "Show transcript"}
+        </button>
+        {showTranscript && (
+          <div className="transcript card">
+            {call.turns.map((t, i) => (
+              <p key={i} className={t.speaker}>
+                <span className="who">
+                  {fmtTime(t.at)} {t.speaker === "rep" ? "You" : buyer.name.split(" ")[0]}
+                  {t.cutIn ? " (cut in)" : ""}
+                </span>
+                {t.text}
+                {t.interrupted ? " —" : ""}
+              </p>
+            ))}
+          </div>
+        )}
+        </>
+      )}
+      {claudeApp && call.rawTranscript && (
+        <>
+          <button className="text-btn" onClick={() => setShowTranscript((v) => !v)}>
+            {showTranscript ? "Hide transcript" : "Show transcript"}
+          </button>
+          {showTranscript && <pre className="transcript card raw">{call.rawTranscript}</pre>}
+        </>
       )}
 
       <div className="btn-row bottom-actions">

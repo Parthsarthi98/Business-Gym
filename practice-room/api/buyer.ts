@@ -2,10 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { checkAccess, json, readJson, requireKeys } from "./_lib";
 import { buyerMessages, buyerSystemPrompt } from "../shared/prompts";
 import type { BuyerRequest } from "../shared/types";
-import settingsJson from "../data/settings.json";
-import type { Settings } from "../shared/types";
-
-const settings = settingsJson as Settings;
+import { fallbackOptions, fastThinking, profileOf } from "./_models";
 
 // Streams the buyer's next reply as plain text. The browser splits it into sentences for speech.
 // In-band signals at the end of the stream: "[[REFUSAL]]" or "[[ERROR: ...]]".
@@ -20,6 +17,8 @@ export async function POST(req: Request): Promise<Response> {
     return json({ error: (e as Error).message }, 400);
   }
 
+  const profile = profileOf(body.profile);
+  const model = profile.buyerModel;
   const client = new Anthropic();
   const encoder = new TextEncoder();
 
@@ -28,16 +27,15 @@ export async function POST(req: Request): Promise<Response> {
       try {
         const s = client.beta.messages.stream(
           {
-            model: settings.models.buyer,
+            model,
             max_tokens: 2000,
             // Thinking off for the lowest delay before the buyer starts speaking.
-            thinking: { type: "between_tools" },
-            output_config: { effort: settings.models.buyerEffort },
+            thinking: fastThinking(model),
+            output_config: { effort: profile.buyerEffort },
             // The persona prompt is identical for every turn of a call, so cache it.
             system: [{ type: "text", text: buyerSystemPrompt(body), cache_control: { type: "ephemeral" } }],
             messages: buyerMessages(body),
-            betas: ["server-side-fallback-2026-07-01"],
-            fallbacks: "default",
+            ...fallbackOptions(model),
           },
           { signal: req.signal },
         );

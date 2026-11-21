@@ -380,3 +380,44 @@ textarea.input { resize: vertical; }
 .expander { padding: 0; }
 .expander-head { display: flex; justify-content: space-between; align-items: center; width: 100%; border: 0; background: none; padding: 14px 16px; text-align: left; cursor: pointer; }
 .expander-body { padding: 0 16px 14px; }
+
+/* ---------- practice mode & Claude-app sessions ---------- */
+.segmented { display: flex; gap: 4px; background: var(--surface-2); border-radius: 14px; padding: 4px; }
+.segmented button {
+  flex: 1;
+  border: 0;
+  background: none;
+  border-radius: 10px;
+  padding: 8px 6px;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 52px;
+  cursor: pointer;
+}
+.segmented button span { font-size: 0.75rem; font-weight: 500; color: var(--muted); }
+.segmented button.on { background: var(--surface); box-shadow: var(--shadow); color: var(--accent); }
+.mode-desc { margin: 0 2px 4px; }
+a.btn { text-decoration: none; color: inherit; }
+.pill-free, .chip-free { background: var(--good-soft); color: var(--good); }
+.step { position: relative; padding-left: 52px; }
+.step-num {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.step ol { padding-left: 1.1em; margin: 0 0 8px; }
+.step.dim { opacity: 0.55; }
+.mono, pre.raw { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; }
+pre.raw { white-space: pre-wrap; word-break: break-word; }
+.text-btn.danger { color: var(--bad); }

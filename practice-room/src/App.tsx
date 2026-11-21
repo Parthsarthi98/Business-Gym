@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { CallRecord, CallSetup } from "../shared/types";
+import type { CallRecord, CallSetup, ProfileId } from "../shared/types";
 import { getStatus, type ServerStatus } from "./lib/api";
 import { listCalls, loadAccessCode, saveAccessCode } from "./lib/storage";
 import { Home } from "./screens/Home";
@@ -9,16 +9,18 @@ import { History } from "./screens/History";
 import { Progress } from "./screens/Progress";
 import { Library } from "./screens/Library";
 import { SettingsScreen } from "./screens/SettingsScreen";
+import { ClaudeAppSession } from "./screens/ClaudeAppSession";
 
 export interface CallPlan {
   setup: CallSetup;
   mode: "voice" | "text";
+  profile: ProfileId;
   audio: AudioContext | null;
   replayOf?: CallRecord;
 }
 
 type Tab = "home" | "history" | "progress" | "library" | "settings";
-type Route = { name: Tab } | { name: "call"; plan: CallPlan } | { name: "debrief"; callId: string };
+type Route = { name: Tab } | { name: "call"; plan: CallPlan } | { name: "debrief"; callId: string } | { name: "claude-app"; setup: CallSetup };
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Call", icon: "M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" },
@@ -87,6 +89,19 @@ export function App() {
       />
     );
   }
+  if (route.name === "claude-app") {
+    return (
+      <ClaudeAppSession
+        setup={route.setup}
+        calls={calls}
+        onExit={() => setRoute({ name: "home" })}
+        onLogged={async (id) => {
+          await refreshCalls();
+          setRoute({ name: "debrief", callId: id });
+        }}
+      />
+    );
+  }
   if (route.name === "debrief") {
     return (
       <Debrief
@@ -102,7 +117,12 @@ export function App() {
   return (
     <div className="shell">
       <main className="screen">
-        {route.name === "home" && <Home status={status} calls={calls} onStart={(plan) => setRoute({ name: "call", plan })} />}
+        {route.name === "home" && <Home
+            status={status}
+            calls={calls}
+            onStart={(plan) => setRoute({ name: "call", plan })}
+            onClaudeApp={(setup) => setRoute({ name: "claude-app", setup })}
+          />}
         {route.name === "history" && <History calls={calls} onOpen={(id) => setRoute({ name: "debrief", callId: id })} />}
         {route.name === "progress" && <Progress calls={calls} />}
         {route.name === "library" && <Library />}

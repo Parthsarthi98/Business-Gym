@@ -4,10 +4,7 @@ import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { checkAccess, json, readJson, requireKeys } from "./_lib";
 import { coachSystemPrompt, coachUserPrompt, retryUserPrompt } from "../shared/prompts";
 import type { CoachRequest, RetryRequest } from "../shared/types";
-import settingsJson from "../data/settings.json";
-import type { Settings } from "../shared/types";
-
-const settings = settingsJson as Settings;
+import { fallbackOptions, profileOf } from "./_models";
 
 const Phase = z.object({ score: z.number().int(), reached: z.boolean(), reason: z.string() });
 
@@ -47,14 +44,14 @@ export async function POST(req: Request): Promise<Response> {
   try {
     if (mode === "retry") {
       const body = await readJson<RetryRequest>(req);
+      const profile = profileOf(body.profile);
       const res = await client.beta.messages.parse({
-        model: settings.models.coach,
+        model: profile.coachModel,
         max_tokens: 16000,
-        output_config: { effort: settings.models.coachEffort, format: betaZodOutputFormat(RetrySchema) },
+        output_config: { effort: profile.coachEffort, format: betaZodOutputFormat(RetrySchema) },
         system: coachSystemPrompt(),
         // If a safety classifier declines, the API retries on a fallback model inside the same call.
-        betas: ["server-side-fallback-2026-07-01"],
-        fallbacks: "default",
+        ...fallbackOptions(profile.coachModel),
         messages: [{ role: "user", content: retryUserPrompt(body) }],
       });
       if (res.stop_reason === "refusal" || !res.parsed_output) return json({ error: "The coach could not review this retry." }, 502);
@@ -62,11 +59,13 @@ export async function POST(req: Request): Promise<Response> {
     }
 
     const body = await readJson<CoachRequest>(req);
+    const profile = profileOf(body.profile);
     const res = await client.beta.messages.parse({
-      model: settings.models.coach,
+      model: profile.coachModel,
       max_tokens: 16000,
-      output_config: { effort: settings.models.coachEffort, format: betaZodOutputFormat(CoachReportSchema) },
+      output_config: { effort: profile.coachEffort, format: betaZodOutputFormat(CoachReportSchema) },
       system: coachSystemPrompt(),
+      ...fallbackOptions(profile.coachModel),
       messages: [{ role: "user", content: coachUserPrompt(body) }],
     });
     if (res.stop_reason === "refusal" || !res.parsed_output) return json({ error: "The coach could not review this call." }, 502);

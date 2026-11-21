@@ -19,9 +19,11 @@ export function History({ calls, onOpen }: { calls: CallRecord[]; onOpen: (id: s
                   {getBuyer(c.setup.buyerId).name} · {getScenario(c.setup.scenarioId).name}
                   {c.replayOf && <span className="chip">replay</span>}
                   {c.mode === "text" && <span className="chip">text</span>}
+                  {c.mode === "claude-app" && <span className="chip chip-free">Claude app</span>}
                 </div>
                 <div className="muted small">
-                  {new Date(c.startedAt).toLocaleDateString()} · {getMethod(c.setup.methodId).shortName} · {fmtTime(c.durationSec * 1000)}
+                  {new Date(c.startedAt).toLocaleDateString()} · {getMethod(c.setup.methodId).shortName}
+                  {c.mode !== "claude-app" && ` · ${fmtTime(c.durationSec * 1000)}`}
                 </div>
                 <div className={`small outcome-text outcome-${c.outcome}`}>{OUTCOME_LABEL[c.outcome]}</div>
               </div>

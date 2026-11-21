@@ -1,10 +1,29 @@
 {
-  "models": {
-    "buyer": "claude-sonnet-5-5",
-    "buyerEffort": "low",
-    "coach": "claude-opus-5-5",
-    "coachEffort": "high"
+  "profiles": {
+    "standard": {
+      "label": "Standard",
+      "description": "Most demanding buyer and most thorough coach. Sonnet 5.5 plays the buyer, Opus 5.5 coaches, Deepgram hears you.",
+      "buyerModel": "claude-sonnet-5-5",
+      "buyerEffort": "low",
+      "coachModel": "claude-opus-5-5",
+      "coachEffort": "high",
+      "stt": "deepgram",
+      "estimatePerHourUsd": 2.15,
+      "estimatePerHourInr": 190
+    },
+    "saver": {
+      "label": "Saver",
+      "description": "About 60% cheaper. Haiku 5.5 plays the buyer (may go a little easier on you), Sonnet 5.5 coaches, and your phone's free built-in speech recognition hears you.",
+      "buyerModel": "claude-haiku-5-5",
+      "buyerEffort": "low",
+      "coachModel": "claude-sonnet-5-5",
+      "coachEffort": "high",
+      "stt": "browser",
+      "estimatePerHourUsd": 0.85,
+      "estimatePerHourInr": 75
+    }
   },
+  "defaultProfile": "standard",
   "voice": {
     "sttModel": "nova-3",
     "sttLanguage": "en",
@@ -14,17 +33,34 @@
     "ttsLanguage": "en-IN",
     "ttsPace": 1.05,
     "ttsBitrate": "64k",
-    "bargeInMinWords": 2
+    "bargeInMinWords": 2,
+    "browserSttLanguage": "en-IN"
   },
   "call": {
     "maxCallMinutes": 20,
-    "endCallPhrases": ["end call", "end the call", "hang up"]
+    "endCallPhrases": [
+      "end call",
+      "end the call",
+      "hang up"
+    ]
   },
   "difficulty": {
     "levels": [
-      { "level": 1, "name": "Standard", "description": "Play the persona as written." },
-      { "level": 2, "name": "Tougher", "description": "Be less forthcoming. Make the rep ask twice for withheld information. Interrupt sooner. Demand evidence for every claim." },
-      { "level": 3, "name": "Hardest", "description": "Raise an extra objection the rep has not prepared for. Give one-word answers to weak questions. End the call at the first sign of a pitch without discovery." }
+      {
+        "level": 1,
+        "name": "Standard",
+        "description": "Play the persona as written."
+      },
+      {
+        "level": 2,
+        "name": "Tougher",
+        "description": "Be less forthcoming. Make the rep ask twice for withheld information. Interrupt sooner. Demand evidence for every claim."
+      },
+      {
+        "level": 3,
+        "name": "Hardest",
+        "description": "Raise an extra objection the rep has not prepared for. Give one-word answers to weak questions. End the call at the first sign of a pitch without discovery."
+      }
     ],
     "raiseWhenAverageAtLeast": 7,
     "lowerWhenAverageBelow": 4,
