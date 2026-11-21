@@ -25,7 +25,7 @@ export function SettingsScreen({ status, onChanged, onStatusRefresh }: { status:
         <h2>Server keys</h2>
         {keyRow("Claude (buyer and coach)", status.anthropic)}
         {keyRow("Deepgram (speech-to-text)", status.deepgram)}
-        {keyRow("ElevenLabs (text-to-speech)", status.elevenlabs)}
+        {keyRow("Sarvam (text-to-speech)", status.sarvam)}
         <p className="muted small">Keys live only on the server. This page shows whether each is set, never its value.</p>
       </section>
 

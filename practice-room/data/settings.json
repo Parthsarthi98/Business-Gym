@@ -10,8 +10,10 @@
     "sttLanguage": "en",
     "endpointingMs": 700,
     "utteranceEndMs": 1200,
-    "ttsModel": "eleven_flash_v2_5",
-    "ttsOutputFormat": "mp3_44100_64",
+    "ttsModel": "bulbul:v4-flash",
+    "ttsLanguage": "en-IN",
+    "ttsPace": 1.05,
+    "ttsBitrate": "64k",
     "bargeInMinWords": 2
   },
   "call": {

@@ -27,7 +27,7 @@ export function Home({ status, calls, onStart }: { status: ServerStatus; calls: 
   const isDefaultMethod = scenario.defaultMethods.includes(method.id);
   const isLast = last && JSON.stringify(last) === JSON.stringify(setup);
 
-  const missingVoice = [!status.deepgram && "DEEPGRAM_API_KEY", !status.elevenlabs && "ELEVENLABS_API_KEY"].filter(Boolean) as string[];
+  const missingVoice = [!status.deepgram && "DEEPGRAM_API_KEY", !status.sarvam && "SARVAM_API_KEY"].filter(Boolean) as string[];
   const voiceReady = status.anthropic && missingVoice.length === 0;
   const secure = window.isSecureContext;
 

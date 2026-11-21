@@ -131,7 +131,13 @@ export class CallEngine {
       } catch (e) {
         return this.fail(`Live voice could not start: ${(e as Error).message}`);
       }
-      this.queue = new SpeechQueue(ctx, (text, signal) => fetchSpeech(text, this.o.buyer.voice.elevenLabsVoiceId, signal), {
+      let warnedVoice = false;
+      const onVoiceFallback = (id: string) => {
+        if (warnedVoice) return;
+        warnedVoice = true;
+        this.set({ notice: `Sarvam did not accept the voice "${id}", so the buyer is using Sarvam's default voice. Change it in the buyer's data file.` });
+      };
+      this.queue = new SpeechQueue(ctx, (text, signal) => fetchSpeech(text, this.o.buyer.voice.sarvamSpeaker, signal, onVoiceFallback), {
         onSentenceStart: (text) => this.set({ activity: "buyer-speaking", caption: text }),
         onIdle: () => {
           if (this.buyerStreamDone) this.finishBuyerTurn();

@@ -22,6 +22,6 @@
   "earnsNextStep": ["The rep asks about his specific operation before pitching", "The rep admits a real limitation honestly", "The rep links Shiftwise to night-shift staffing or dispatch performance with evidence"],
   "speechStyle": "Short, clipped sentences. Interrupts when bored. Rarely volunteers information.",
   "patienceSeconds": 40,
-  "voice": { "elevenLabsVoiceId": "nPczCjzI2devNBz1zQrb", "label": "Brian (deep, measured)" },
+  "voice": { "sarvamSpeaker": "dev_en_conversational", "label": "Dev (conversational, measured)" },
   "phoneGreeting": "Marcus Webb."
 }

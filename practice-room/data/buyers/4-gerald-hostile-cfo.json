@@ -22,6 +22,6 @@
   "earnsNextStep": ["The rep builds a conservative ROI using the typical result, not the best one", "The rep asks about agency spend or overtime with real specifics", "The rep proposes a measurable pilot with a clear exit"],
   "speechStyle": "Short, cutting sentences. Interrupts. Asks 'what's the payback?' and 'what's that cost me?' repeatedly.",
   "patienceSeconds": 25,
-  "voice": { "elevenLabsVoiceId": "JBFqnCBsd6RMkjVDRZzb", "label": "George (firm, authoritative)" },
+  "voice": { "sarvamSpeaker": "girish_en_documentary", "label": "Girish (firm, authoritative)" },
   "phoneGreeting": "Haines. You've got five minutes."
 }

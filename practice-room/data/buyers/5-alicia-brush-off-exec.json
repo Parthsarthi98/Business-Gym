@@ -22,6 +22,6 @@
   "earnsNextStep": ["The rep earns attention with something specific to fast-growing fulfilment operations", "The rep asks a question that gets her talking about the new sites", "The rep asks for a short, specific next step instead of a vague 'catch-up'"],
   "speechStyle": "Brisk, pleasant, slightly distracted. Tries to end the call early with 'just send me an email'.",
   "patienceSeconds": 20,
-  "voice": { "elevenLabsVoiceId": "Xb7hH8MSUJpSbSDYk0k2", "label": "Alice (clear, brisk)" },
+  "voice": { "sarvamSpeaker": "simran_en_conversation", "label": "Simran (brisk, conversational)" },
   "phoneGreeting": "Alicia speaking. Who's this?"
 }

@@ -5,7 +5,7 @@ import { loadAccessCode } from "./storage";
 export interface ServerStatus {
   anthropic: boolean;
   deepgram: boolean;
-  elevenlabs: boolean;
+  sarvam: boolean;
   accessCodeSet: boolean;
   accessOk: boolean;
 }
@@ -33,9 +33,17 @@ export async function getSttToken(): Promise<string> {
   return ((await res.json()) as { token: string }).token;
 }
 
-export async function fetchSpeech(text: string, voiceId: string, signal: AbortSignal): Promise<ArrayBuffer> {
+/** onVoiceFallback fires when the server had to use Sarvam's default voice instead of the buyer's. */
+export async function fetchSpeech(
+  text: string,
+  voiceId: string,
+  signal: AbortSignal,
+  onVoiceFallback?: (voiceId: string) => void,
+): Promise<ArrayBuffer> {
   const res = await fetch("/api/tts", { method: "POST", headers: headers(), body: JSON.stringify({ text, voiceId }), signal });
   if (!res.ok) throw new Error(await errorText(res));
+  const fellBack = res.headers.get("x-voice-fallback");
+  if (fellBack) onVoiceFallback?.(fellBack);
   return res.arrayBuffer();
 }
 

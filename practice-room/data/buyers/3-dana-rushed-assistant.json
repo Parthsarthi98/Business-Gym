@@ -22,6 +22,6 @@
   "earnsNextStep": ["The rep is honest that this is a sales call", "The rep explains in one sentence why it matters to Helen now", "The rep treats Dana as a decision-shaper and asks for her advice"],
   "speechStyle": "Fast, efficient, polite. Often says she has two minutes. Ends the call if it drifts.",
   "patienceSeconds": 30,
-  "voice": { "elevenLabsVoiceId": "FGY2WhTYpPnrIDTdsKH5", "label": "Laura (quick, crisp)" },
+  "voice": { "sarvamSpeaker": "ishita_en_customer", "label": "Ishita (crisp, professional)" },
   "phoneGreeting": "Helen Price's office, Dana speaking."
 }

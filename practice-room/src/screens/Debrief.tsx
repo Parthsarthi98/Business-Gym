@@ -97,7 +97,7 @@ export function Debrief({ callId, status, onClose, onChanged, onStartPlan }: Pro
   const replay = (mode: "voice" | "text") =>
     onStartPlan({ setup: call.setup, mode, audio: mode === "voice" ? unlockAudio() : null, replayOf: call });
   const again = (mode: "voice" | "text") => onStartPlan({ setup: call.setup, mode, audio: mode === "voice" ? unlockAudio() : null });
-  const voiceReady = status.anthropic && status.deepgram && status.elevenlabs;
+  const voiceReady = status.anthropic && status.deepgram && status.sarvam;
 
   return (
     <div className="debrief screen">

@@ -6,7 +6,7 @@ export async function GET(req: Request): Promise<Response> {
   return json({
     anthropic: missingKeys("ANTHROPIC_API_KEY").length === 0,
     deepgram: missingKeys("DEEPGRAM_API_KEY").length === 0,
-    elevenlabs: missingKeys("ELEVENLABS_API_KEY").length === 0,
+    sarvam: missingKeys("SARVAM_API_KEY").length === 0,
     accessCodeSet: Boolean(expected),
     accessOk: Boolean(expected) && req.headers.get("x-access-code") === expected,
   });

@@ -14,7 +14,7 @@ This is a practice room only: no outbound calling, no real prospects, no telepho
  ─────────────                           ────────────────────              ────────
  mic ─► 16-bit PCM ─────────────── WebSocket (short-lived token) ──────►  Deepgram (speech-to-text)
  transcript ─► /api/buyer ───────────► builds buyer prompt ─── stream ─►  Claude Sonnet 5.5 (buyer)
- text split into sentences ─► /api/tts ─► one sentence at a time ──────►  ElevenLabs (text-to-speech)
+ text split into sentences ─► /api/tts ─► one sentence at a time ──────►  Sarvam Bulbul (text-to-speech)
  audio queue ─► speaker
  hang up ─► /api/coach ──────────────► builds coach prompt ────────────►  Claude Opus 5.5 (coach)
  history, scores, progress: IndexedDB on the phone (never leaves the device)
@@ -48,11 +48,22 @@ This is a practice room only: no outbound calling, no real prospects, no telepho
 | Service | Used for | Approximate cost |
 |---|---|---|
 | Anthropic Claude API | Buyer (Sonnet 5.5) and coach (Opus 5.5) | Sonnet 5.5: $2 / $10 per million input / output tokens. Opus 5.5: $4 / $20. |
-| Deepgram Nova-3 | Streaming speech-to-text | About $0.0077 per minute |
-| ElevenLabs Flash v2.5 | Buyer voices | About $0.04–0.05 per 1,000 characters |
+| Deepgram Nova-3 | Streaming speech-to-text | About $0.0077 per minute of call time |
+| Sarvam Bulbul v4 Flash | Buyer voices | ₹20 per 10,000 characters of buyer speech (₹17 on Sarvam's Growth plan) |
 
-Rough total: **$0.30–0.90 per 10-minute practice call** including the coach's review. Check
-each vendor's pricing page; these figures come from public summaries in November 2026.
+Estimate per hour of practice (six 10-minute calls, the buyer speaking about a third of the time):
+
+| Item | Per practice hour |
+|---|---|
+| Deepgram (microphone open the whole call) | about $0.46 (₹41) |
+| Sarvam (about 21,000 characters of buyer speech) | about ₹42 ($0.48) |
+| Claude buyer (about 150 short replies) | about $0.45 (₹40) |
+| Claude coach (six reviews) | about $0.75 (₹66) |
+| **Total** | **about $2.15 (₹190); range $1.70–2.80** |
+
+Monthly: 5 hours ≈ $11 (₹950); 15 hours, i.e. 30 minutes a day ≈ $32 (₹2,850); 30 hours,
+i.e. an hour a day ≈ $65 (₹5,700). Rupee figures assume about ₹88 to the dollar. Check each
+vendor's pricing page; these figures come from public pricing in November 2026.
 
 ## Set up
 
@@ -62,7 +73,7 @@ You need four values. Never commit them.
 |---|---|
 | `ANTHROPIC_API_KEY` | console.anthropic.com → API keys |
 | `DEEPGRAM_API_KEY` | console.deepgram.com → API keys. Give it the **Member** role or higher, so it can mint short-lived browser tokens. |
-| `ELEVENLABS_API_KEY` | elevenlabs.io → Settings → API keys |
+| `SARVAM_API_KEY` | dashboard.sarvam.ai → API keys |
 | `APP_ACCESS_CODE` | A passphrase you choose. The app asks for it once per device. It stops anyone who finds your URL from spending your credit. |
 
 ### Deploy to Vercel (phone use)
@@ -104,9 +115,10 @@ To practise with a real product, paste its brief in **Settings → Your product*
 pricing, proof points and limitations: the coach treats any claim outside the brief as
 invented.
 
-**Buyer voices:** each buyer file has an ElevenLabs voice ID from the standard voice library.
-If a voice is not available on your ElevenLabs account, the app shows "The buyer's voice
-failed" and switches captions on. Replace the ID with any voice from your ElevenLabs library.
+**Buyer voices:** each buyer file has a Sarvam `bulbul:v4-flash` voice persona ID (lowercase,
+for example `neha_en_customer`). The voices speak Indian English (`en-IN`, set in
+`data/settings.json`). If Sarvam rejects a voice ID, the server retries with Sarvam's default
+voice and the call screen says so; replace the ID with one from Sarvam's Voices guide.
 
 ## Code map
 
@@ -115,7 +127,7 @@ failed" and switches captions on. Replace the ID with any voice from your Eleven
 | `api/buyer.ts` | Streams the buyer's reply from Claude (thinking off, prompt cached) |
 | `api/coach.ts` | Coach review and replay review, as structured JSON from Claude |
 | `api/stt-token.ts` | Mints a 60-second Deepgram token so the real key never reaches the browser |
-| `api/tts.ts` | Sends one sentence to ElevenLabs and streams the audio back |
+| `api/tts.ts` | Sends one sentence to Sarvam and streams the MP3 audio back |
 | `api/status.ts` | Reports which keys are configured (never their values) |
 | `shared/prompts.ts` | The buyer and coach prompts |
 | `src/call/engine.ts` | Turn-taking, barge-in, buyer cut-in, end-call detection |

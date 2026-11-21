@@ -36,7 +36,8 @@ export interface Buyer {
   earnsNextStep: string[];
   speechStyle: string;
   patienceSeconds: number;
-  voice: { elevenLabsVoiceId: string; label: string };
+  /** A Sarvam bulbul:v4-flash voice persona ID (lowercase), from Sarvam's Voices guide. */
+  voice: { sarvamSpeaker: string; label: string };
   phoneGreeting: string;
 }
 
@@ -86,7 +87,9 @@ export interface Settings {
     endpointingMs: number;
     utteranceEndMs: number;
     ttsModel: string;
-    ttsOutputFormat: string;
+    ttsLanguage: string;
+    ttsPace: number;
+    ttsBitrate: string;
     bargeInMinWords: number;
   };
   call: { maxCallMinutes: number; endCallPhrases: string[] };

@@ -22,6 +22,6 @@
   "earnsNextStep": ["The rep understands her peak-season deadline", "The rep gives an honest answer on onboarding time", "The rep suggests a next step that involves the Finance Director or fits her timeline"],
   "speechStyle": "Warm, conversational, medium-length sentences. Occasionally thinks out loud.",
   "patienceSeconds": 75,
-  "voice": { "elevenLabsVoiceId": "cgSgspJ2msm6clMCkdW9", "label": "Jessica (warm)" },
+  "voice": { "sarvamSpeaker": "neha_en_customer", "label": "Neha (warm, customer-facing)" },
   "phoneGreeting": "Hi, this is Priya."
 }
