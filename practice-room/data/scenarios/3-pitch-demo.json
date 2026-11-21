@@ -1,0 +1,13 @@
+{
+  "id": "pitch-demo",
+  "order": 3,
+  "name": "Product pitch and demo",
+  "summary": "Present, then walk the buyer through what they would see, while they poke holes.",
+  "defaultMethods": ["challenger", "storytelling"],
+  "suggestedBuyers": ["marcus-skeptical-vp", "priya-warm-inbound", "gerald-hostile-cfo"],
+  "repBrief": "A scheduled pitch and demo. You have 20 minutes. Present Shiftwise and walk the buyer through what they would see on screen (describe it out loud; there is no real screen). Expect hard questions.",
+  "buyerBrief": "You agreed to see a pitch and demo. The rep will describe what is on their screen. Poke holes: ask how it handles your specific situation, ask about limitations, ask what happens when things go wrong. Reward specifics; punish feature lists.",
+  "buyerOpensCall": false,
+  "phaseFocus": ["opener", "objectionHandling", "close"],
+  "winCondition": "The buyer agrees to a pilot, a proposal, or a meeting with the decision-maker."
+}

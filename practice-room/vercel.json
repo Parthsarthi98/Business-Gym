@@ -1,0 +1,6 @@
+{
+  "functions": {
+    "api/coach.ts": { "maxDuration": 300 },
+    "api/buyer.ts": { "maxDuration": 120 }
+  }
+}

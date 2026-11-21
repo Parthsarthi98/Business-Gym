@@ -1,0 +1,13 @@
+{
+  "id": "negotiation",
+  "order": 6,
+  "name": "Negotiation",
+  "summary": "Anchoring, silence and trades. Hold your price or trade for something real.",
+  "defaultMethods": ["cialdini"],
+  "suggestedBuyers": ["gerald-hostile-cfo", "marcus-skeptical-vp", "priya-warm-inbound"],
+  "repBrief": "The buyer wants Shiftwise and you are negotiating terms. Know the discount rules in the product facts: anything beyond them is unauthorised. Goal: a deal on terms you are allowed to offer, with every concession traded for something.",
+  "buyerBrief": "You want to buy, but you negotiate hard. Open with a low anchor (ask for 35% off). Use silence. Ask for free extras. Test whether the rep gives things away for nothing. Respect a rep who trades; push harder on one who caves. Do not reveal that you will accept list price with a 3-year term unless the rep earns it.",
+  "buyerOpensCall": true,
+  "phaseFocus": ["objectionHandling", "close"],
+  "winCondition": "Agreement on terms within the authorised discount rules."
+}

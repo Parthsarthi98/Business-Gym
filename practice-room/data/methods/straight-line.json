@@ -1,0 +1,25 @@
+{
+  "id": "straight-line",
+  "name": "Straight Line",
+  "shortName": "Straight Line",
+  "origin": "Jordan Belfort's practitioner sales system, described in his book \"Way of the Wolf\". This drill is an original training adaptation of its published ideas, not a reproduction of the book or course.",
+  "evidenceType": "Practitioner system. Built from one seller's experience; not tested in controlled studies. Its author was convicted of securities fraud, so this app teaches only the honest parts: certainty must come from true claims, never from pressure.",
+  "fits": ["Cold calls", "Outbound prospecting", "Short cycles with a single decision-maker", "Direct closes"],
+  "strains": ["Long, consensus-driven enterprise cycles with many stakeholders", "Buyers who distrust a seller who steers hard", "Situations where the honest answer is that the product is not a fit"],
+  "coreMoves": [
+    "Take control early: state who you are, why you are calling and where the call is going in the first 15 seconds.",
+    "Come across as sharp, enthusiastic and expert from the first sentence. Energy and clarity, not hype.",
+    "Use deliberate tonality and pacing: slow down for important points, sound curious when asking, certain when stating facts.",
+    "Qualify with ordered questions before pitching: is there a need, is there budget, is this the decision-maker, what is the timeline.",
+    "Build the buyer's certainty on three scales at once: the product, you, and your company.",
+    "Treat an objection as a sign of uncertainty on one of the three scales. Acknowledge it, then loop back to rebuild certainty on that scale instead of arguing the objection head-on.",
+    "Lower the effort of saying yes (small, clear next step) and make the true cost of the status quo visible."
+  ],
+  "coachCriteria": {
+    "opener": ["Took control in the first 15 seconds with a clear reason for the call", "Sounded sharp and credible rather than scripted or apologetic", "Asked permission or set an agenda instead of launching into a pitch"],
+    "discovery": ["Asked qualifying questions in a sensible order before pitching", "Confirmed need, authority, budget and timeline", "Kept the conversation moving toward a decision without rushing past answers"],
+    "objectionHandling": ["Identified which certainty scale (product, rep, company) the objection came from", "Acknowledged the objection, then looped back to rebuild certainty with true, specific evidence", "Did not argue head-on or repeat the same pitch louder"],
+    "close": ["Asked for a specific, low-effort next step", "Made the cost of doing nothing concrete and honest", "Accepted a clear no instead of pushing past it"]
+  },
+  "ethicsGuardrails": ["Certainty must come from accurate claims. Inflating results to build certainty is deception.", "Looping is allowed at most twice on the same objection; after a clear no, the rep must stop.", "No invented urgency or fake 'today only' terms."]
+}

@@ -1,0 +1,36 @@
+{
+  "id": "shiftwise",
+  "name": "Shiftwise",
+  "fictional": true,
+  "oneLiner": "Shift scheduling and labour forecasting software for warehouses and distribution centres.",
+  "whatItDoes": [
+    "Forecasts labour demand per shift from order volumes, inbound shipments and historical pick rates.",
+    "Builds shift rosters automatically, respecting skills, contracts, overtime rules and time-off requests.",
+    "Lets workers swap shifts and pick up open shifts from a phone app, with manager approval rules.",
+    "Shows supervisors a live view of planned versus actual labour hours per zone."
+  ],
+  "pricing": {
+    "model": "Per active worker per month, billed annually.",
+    "listPrice": "$9 per worker per month. A 400-worker site is about $43,200 a year.",
+    "implementation": "One-off onboarding fee of $12,000 per site, covering integration and training.",
+    "discountRules": "Up to 10% off list for a 3-year commitment. Up to 15% for 3+ sites signed together. No other discounts are authorised."
+  },
+  "proof": [
+    "42 customer sites live, all in logistics and light manufacturing.",
+    "Typical (median) result: overtime hours down 9% in the first six months.",
+    "Best result: one 3PL customer, Harbourline Logistics (fictional), cut overtime 18% and agency spend 22% in a year.",
+    "Average onboarding time: 7 weeks per site."
+  ],
+  "limitations": [
+    "No native payroll; integrates with three payroll systems only (the rest need a CSV export).",
+    "The forecasting model needs at least 6 months of order history to be accurate.",
+    "The company is 4 years old with 60 employees; some buyers see that as a risk.",
+    "No on-premise option; cloud only."
+  ],
+  "competitors": [
+    { "name": "Kronara", "position": "Large incumbent workforce suite. Broad, expensive, slow to change." },
+    { "name": "RotaPilot", "position": "Cheap self-serve scheduling app. Fine for small sites, weak forecasting." },
+    { "name": "Spreadsheets and supervisor judgement", "position": "The real status quo at most sites." }
+  ],
+  "truthRules": "The rep may only claim what is listed above. Any number, customer or feature not listed here is invented."
+}

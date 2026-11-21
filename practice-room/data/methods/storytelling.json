@@ -1,0 +1,24 @@
+{
+  "id": "storytelling",
+  "name": "Storytelling (Narrative Transportation)",
+  "shortName": "Story",
+  "origin": "Narrative transportation research in peer-reviewed psychology (Green and Brock and later work): listeners absorbed in a story counterargue less and shift beliefs more. This drill is an original training adaptation.",
+  "evidenceType": "Peer-reviewed experimental psychology, including meta-analyses of narrative persuasion.",
+  "fits": ["Pitches", "Demos", "Interviews", "Keynote-style persuasion", "Making an abstract benefit concrete"],
+  "strains": ["Buyers who asked a direct question and want a direct answer", "Highly technical evaluations where specifics matter more than narrative", "Stories that are invented or embellished"],
+  "coreMoves": [
+    "A concrete protagonist the listener can picture (a named role at a real-feeling company, not 'our customers').",
+    "Tension: what was at stake, what went wrong, what the protagonist tried that did not work.",
+    "Resolution: what changed, with a specific, honest result.",
+    "Sensory specifics over abstractions: a moment, a place, a number on a screen.",
+    "Fit the length to the moment: a 60-second version, a 3-minute version, and a boardroom version that leads with the result and the money.",
+    "Tie the story back to the listener: 'the reason I tell you this is...'"
+  ],
+  "coachCriteria": {
+    "opener": ["Hooked attention quickly with a concrete moment or person", "Signalled why the story matters to this listener"],
+    "discovery": ["Chose a story that matches what the buyer has said they care about", "Checked the story landed (asked a question after it)"],
+    "objectionHandling": ["Answered objections with a relevant, true story or example rather than generic claims", "Kept stories short when the buyer was impatient"],
+    "close": ["Linked the story's resolution to a clear next step for this buyer", "Fitted the length to the format (60 seconds, 3 minutes, or boardroom)"]
+  },
+  "ethicsGuardrails": ["Stories must be true or clearly framed as hypothetical. Presenting an invented story as a real customer is deception.", "Results in stories must match the product facts."]
+}

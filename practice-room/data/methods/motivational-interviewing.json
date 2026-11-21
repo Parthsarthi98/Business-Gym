@@ -1,0 +1,24 @@
+{
+  "id": "motivational-interviewing",
+  "name": "Motivational-Interviewing Style Discovery",
+  "shortName": "MI Discovery",
+  "origin": "Adapted from motivational interviewing, a counselling method developed by William Miller and Stephen Rollnick. This drill is an original training adaptation for sales discovery, not clinical practice.",
+  "evidenceType": "Evidence-based counselling method with meta-analytic support in health settings. Its use in sales is an adaptation and less studied.",
+  "fits": ["Discovery with skeptical or ambivalent buyers", "Buyers who resist being 'sold to'", "Situations where the buyer is unsure whether change is worth it"],
+  "strains": ["Moments that need a direct ask", "Time-poor gatekeepers", "Buyers who want a fast price and a fast answer"],
+  "coreMoves": [
+    "Open questions that cannot be answered yes or no.",
+    "Reflective listening: say back what you heard, including the feeling, before moving on.",
+    "Affirm the buyer's effort and constraints without flattery.",
+    "Draw out 'change talk': the buyer's own reasons, in their own words, for doing something different.",
+    "Roll with resistance: when the buyer pushes back, reflect it instead of arguing.",
+    "Summarise, then ask permission before offering information or a recommendation."
+  ],
+  "coachCriteria": {
+    "opener": ["Opened with curiosity and a reason to talk, not a pitch", "Asked permission to explore"],
+    "discovery": ["Mostly open questions", "Used accurate reflections, including complex ones (meaning or feeling, not just repetition)", "Drew out the buyer's own reasons to change", "Talked less than the buyer"],
+    "objectionHandling": ["Rolled with resistance by reflecting it rather than arguing", "Did not try to argue the buyer into change"],
+    "close": ["Summarised the buyer's own reasons before proposing anything", "Asked permission before giving a recommendation", "Made a clear, direct ask when the moment called for one"]
+  },
+  "ethicsGuardrails": ["Reflections must be honest. Twisting the buyer's words into agreement they did not give is manipulation.", "Respect the buyer's autonomy: a reasoned 'not now' is a valid outcome."]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "cialdini",
+  "name": "Cialdini's Influence Principles",
+  "shortName": "Influence",
+  "origin": "Robert Cialdini's influence principles, drawn from experimental social psychology. This drill is an original training adaptation of the published principles.",
+  "evidenceType": "Experimental social psychology. Individual effects are well studied, though some classic findings have replicated with smaller effects than first reported.",
+  "fits": ["Framing offers", "Negotiation", "Marketing copy", "Ethical nudges toward a decision the buyer already wants"],
+  "strains": ["Skeptical buyers who spot technique quickly", "Any use where the principle is faked (fake scarcity, fake social proof)"],
+  "coreMoves": [
+    "Reciprocity: give something genuinely useful first (an insight, a benchmark, a free audit) with no strings.",
+    "Commitment and consistency: get small, voluntary, sincere agreements that line up with the buyer's own stated goals.",
+    "Social proof: cite real, comparable customers and real results, including the typical result, not only the best one.",
+    "Authority: show relevant expertise and credentials honestly; let evidence carry the weight.",
+    "Liking: find real common ground and be genuinely helpful; do not fake rapport.",
+    "Scarcity: mention real limits (real deadlines, real capacity) only when they exist."
+  ],
+  "coachCriteria": {
+    "opener": ["Built genuine liking or gave something of value early", "Established relevant authority without boasting"],
+    "discovery": ["Learned what the buyer values so the principles could be applied honestly", "Secured small, sincere agreements tied to the buyer's own goals"],
+    "objectionHandling": ["Used real, comparable social proof to answer doubts", "Did not escalate to pressure or fake urgency"],
+    "close": ["Anchored and traded deliberately in negotiation (give something only to get something)", "Used silence and clear asks rather than filling space with concessions", "Any scarcity or deadline mentioned was real"]
+  },
+  "ethicsGuardrails": ["Fake scarcity, invented deadlines and made-up customer stories are deception and must be flagged.", "Reciprocity must not be used to create guilt.", "The buyer in this app is told to call out manipulative use."]
+}

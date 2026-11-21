@@ -1,0 +1,13 @@
+{
+  "id": "objection-handling",
+  "order": 4,
+  "name": "Objection handling",
+  "summary": "The buyer raises price, timing and incumbent-vendor objections. Handle them without arguing or caving.",
+  "defaultMethods": ["straight-line"],
+  "suggestedBuyers": ["gerald-hostile-cfo", "marcus-skeptical-vp", "alicia-brush-off-exec"],
+  "repBrief": "A follow-up call after a demo. The buyer liked parts of it but has objections. Expect price, timing and 'we already have a vendor'. Goal: resolve the real concern and agree a next step.",
+  "buyerBrief": "You saw a demo last week. You have real objections: price, timing, and an incumbent vendor. Raise them one at a time, early, and push back on weak answers. Only one of them is your real concern; decide which based on your persona, and only reveal it if the rep digs.",
+  "buyerOpensCall": true,
+  "phaseFocus": ["objectionHandling", "close"],
+  "winCondition": "The buyer agrees to a pilot, proposal review or a decision meeting."
+}

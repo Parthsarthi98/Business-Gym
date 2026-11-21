@@ -1,0 +1,23 @@
+{
+  "id": "challenger",
+  "name": "Challenger",
+  "shortName": "Challenger",
+  "origin": "Matthew Dixon and Brent Adamson, from CEB (now Gartner) survey research on sales reps. This drill is an original training adaptation of its published ideas.",
+  "evidenceType": "Large-scale survey and performance research by a commercial research firm. Findings are correlational and partly proprietary.",
+  "fits": ["Complex B2B sales", "Multiple stakeholders", "Buyers stuck in a status quo they have not questioned"],
+  "strains": ["Simple inbound purchases where the buyer already knows what they want", "Early calls where you have not earned the right to challenge", "Cultures or buyers that read tension as disrespect"],
+  "coreMoves": [
+    "Teach: bring a disruptive, accurate insight about the buyer's own business that reframes how they see their problem.",
+    "Lead to your strength: the insight should point toward something you do better, without being a disguised pitch.",
+    "Tailor: fit the message to the stakeholder's role, goals and metrics.",
+    "Take control of the commercial conversation: be direct about money, next steps and the decision process.",
+    "Hold constructive tension: when the buyer pushes back, stay calm and stay on the point instead of retreating or agreeing to make the tension go away."
+  ],
+  "coachCriteria": {
+    "opener": ["Opened with a relevant insight or reframe rather than a product description", "Made the insight specific to this buyer's role and company"],
+    "discovery": ["Tested the insight against the buyer's situation with questions", "Learned the buyer's metrics and decision process"],
+    "objectionHandling": ["Held constructive tension instead of retreating or caving on price at the first push", "Stayed respectful and backed claims with evidence"],
+    "close": ["Was direct about the commercial next step, cost and decision process", "Proposed a next step that involves the right stakeholders"]
+  },
+  "ethicsGuardrails": ["The 'insight' must be true and sourced. Inventing a statistic to create tension is deception.", "Tension is about ideas, never about pressuring the person."]
+}

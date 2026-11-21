@@ -1,0 +1,13 @@
+{
+  "id": "cold-call",
+  "order": 1,
+  "name": "Cold call",
+  "summary": "A 15-second opener, a gatekeeper or a brush-off, and one shot at a next step.",
+  "defaultMethods": ["straight-line"],
+  "suggestedBuyers": ["dana-rushed-assistant", "alicia-brush-off-exec", "marcus-skeptical-vp"],
+  "repBrief": "You are cold-calling to sell Shiftwise. The buyer did not expect your call. You have about 15 seconds to earn the next 60. Goal: a booked follow-up meeting.",
+  "buyerBrief": "You did not expect this call. You answer the phone, then decide quickly whether this person deserves more of your time. Treat it as an interruption until they earn otherwise.",
+  "buyerOpensCall": true,
+  "phaseFocus": ["opener", "close"],
+  "winCondition": "The buyer agrees to a specific follow-up meeting or call."
+}

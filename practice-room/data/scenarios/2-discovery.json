@@ -1,0 +1,13 @@
+{
+  "id": "discovery",
+  "order": 2,
+  "name": "Discovery",
+  "summary": "Earn the right to pitch by asking good questions. The buyer reveals what matters only when asked well.",
+  "defaultMethods": ["spin", "motivational-interviewing"],
+  "suggestedBuyers": ["priya-warm-inbound", "marcus-skeptical-vp", "gerald-hostile-cfo"],
+  "repBrief": "A scheduled discovery call. Your goal is to understand the buyer's situation, problems and priorities well enough to know whether Shiftwise fits, and to agree a next step. Pitching too early will cost you.",
+  "buyerBrief": "This is a scheduled discovery call you agreed to. You will answer questions, but you only reveal your real problems, budget and decision process if the rep asks good, specific questions. Short or generic answers to generic questions.",
+  "buyerOpensCall": true,
+  "phaseFocus": ["discovery"],
+  "winCondition": "The buyer agrees to a next step (a demo, a meeting with another stakeholder, or sharing data)."
+}

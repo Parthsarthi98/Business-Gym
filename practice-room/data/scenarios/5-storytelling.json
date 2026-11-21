@@ -1,0 +1,13 @@
+{
+  "id": "storytelling",
+  "order": 5,
+  "name": "Storytelling and persuasion",
+  "summary": "Tell one customer story three ways: 60 seconds, 3 minutes, and the boardroom version.",
+  "defaultMethods": ["storytelling"],
+  "suggestedBuyers": ["priya-warm-inbound", "marcus-skeptical-vp", "gerald-hostile-cfo"],
+  "repBrief": "Tell the Harbourline Logistics story (see the product facts) three times. First the 60-second version, then the 3-minute version when asked, then the boardroom version for executives. Keep every fact true.",
+  "buyerBrief": "You asked the rep to tell you about a customer like you. First ask for 'the short version'. Then ask for more detail. Then say: 'Now give it to me the way you would tell my board.' React honestly: lean in when it is concrete, interrupt when it is abstract or sounds made up.",
+  "buyerOpensCall": false,
+  "phaseFocus": ["opener", "close"],
+  "winCondition": "The buyer says they want to share the story with someone else or asks for a next step."
+}

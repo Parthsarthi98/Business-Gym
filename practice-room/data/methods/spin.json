@@ -1,0 +1,23 @@
+{
+  "id": "spin",
+  "name": "SPIN Selling",
+  "shortName": "SPIN",
+  "origin": "Neil Rackham, based on Huthwaite's observational research across tens of thousands of real sales calls. This drill is an original training adaptation of its published ideas.",
+  "evidenceType": "Observational field research on recorded sales calls. Strong for large, complex sales; the original research found small-sale techniques did not transfer to big deals.",
+  "fits": ["Discovery calls", "Consultative, complex sales", "Buyers who have a problem they have not fully sized"],
+  "strains": ["Fast transactional calls", "Buyers who already know what they want and only need a price", "Gatekeepers with 30 seconds to spare"],
+  "coreMoves": [
+    "Situation questions: learn the facts of the buyer's current setup. Keep these few; too many bore the buyer.",
+    "Problem questions: find difficulties, dissatisfactions and pain in the current setup.",
+    "Implication questions: explore the consequences of those problems (cost, risk, knock-on effects) so the buyer feels their size.",
+    "Need-payoff questions: get the buyer to say, in their own words, the value of solving the problem.",
+    "Present the solution late, and only against needs the buyer has stated. Pitching before diagnosing is penalised."
+  ],
+  "coachCriteria": {
+    "opener": ["Set a purpose for the call that invites the buyer to talk", "Did not pitch features in the opener"],
+    "discovery": ["Asked Situation, then Problem, then Implication, then Need-payoff questions", "Kept Situation questions brief and relevant", "Developed at least one problem through Implication questions before offering anything", "Got the buyer to state the value of a solution in their own words"],
+    "objectionHandling": ["Prevented objections by building value first rather than handling them after", "When an objection came, returned to the buyer's stated needs and implications"],
+    "close": ["Proposed a next step that matched the buyer's stated needs", "Asked for a commitment that moves the sale forward (an advance), not just a vague follow-up"]
+  },
+  "ethicsGuardrails": ["Implication questions must explore real consequences, not invent or exaggerate fears.", "Do not put words in the buyer's mouth during Need-payoff questions."]
+}

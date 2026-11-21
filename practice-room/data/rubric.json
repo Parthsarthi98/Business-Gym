@@ -1,0 +1,25 @@
+{
+  "phases": [
+    { "id": "opener", "name": "Opener", "description": "The first 15 to 60 seconds: who you are, why you are calling or meeting, and whether the buyer chooses to keep listening." },
+    { "id": "discovery", "name": "Discovery", "description": "Questions that uncover the buyer's situation, problems, priorities, budget and decision process before pitching." },
+    { "id": "objectionHandling", "name": "Objection handling", "description": "How the rep responds to pushback, doubt, price challenges and brush-offs." },
+    { "id": "close", "name": "Close", "description": "Asking for a clear, specific next step, and handling the answer, including a no." }
+  ],
+  "scoreAnchors": {
+    "0-2": "Missing or harmful: the move was absent when it was needed, or it actively damaged the call.",
+    "3-4": "Weak: attempted but generic, rushed, or off-method.",
+    "5-6": "Adequate: did the basic job, with clear room to improve.",
+    "7-8": "Strong: specific, well-timed, and true to the method.",
+    "9-10": "Excellent: would work on a demanding real buyer; hard to improve."
+  },
+  "notReachedRule": "If the call ended before a phase happened, mark it not reached and score it 0, and say why it was not reached (often that is the lesson).",
+  "ethicsRules": [
+    "Flag any claim not supported by the product facts (invented numbers, customers or features).",
+    "Flag best-case results presented as typical.",
+    "Flag invented urgency, fake scarcity or fake deadlines.",
+    "Flag pretexts (pretending to know someone, claiming a meeting was agreed when it was not).",
+    "Flag pushing past a clear no.",
+    "Flag unauthorised discounts or promises the rep cannot keep."
+  ],
+  "ethicsPenalty": "A deceptive move caps the score of the phase it occurred in at 4, however well it worked on the buyer."
+}

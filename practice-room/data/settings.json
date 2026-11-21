@@ -1,0 +1,31 @@
+{
+  "models": {
+    "buyer": "claude-sonnet-5-5",
+    "buyerEffort": "low",
+    "coach": "claude-opus-5-5",
+    "coachEffort": "high"
+  },
+  "voice": {
+    "sttModel": "nova-3",
+    "sttLanguage": "en",
+    "endpointingMs": 700,
+    "utteranceEndMs": 1200,
+    "ttsModel": "eleven_flash_v2_5",
+    "ttsOutputFormat": "mp3_44100_64",
+    "bargeInMinWords": 2
+  },
+  "call": {
+    "maxCallMinutes": 20,
+    "endCallPhrases": ["end call", "end the call", "hang up"]
+  },
+  "difficulty": {
+    "levels": [
+      { "level": 1, "name": "Standard", "description": "Play the persona as written." },
+      { "level": 2, "name": "Tougher", "description": "Be less forthcoming. Make the rep ask twice for withheld information. Interrupt sooner. Demand evidence for every claim." },
+      { "level": 3, "name": "Hardest", "description": "Raise an extra objection the rep has not prepared for. Give one-word answers to weak questions. End the call at the first sign of a pitch without discovery." }
+    ],
+    "raiseWhenAverageAtLeast": 7,
+    "lowerWhenAverageBelow": 4,
+    "windowCalls": 3
+  }
+}

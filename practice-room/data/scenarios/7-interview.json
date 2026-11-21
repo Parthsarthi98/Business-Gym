@@ -1,0 +1,13 @@
+{
+  "id": "interview",
+  "order": 7,
+  "name": "Interview pressure",
+  "summary": "The same muscles aimed at a job interview: open strong, answer with evidence, handle hard questions, close.",
+  "defaultMethods": ["storytelling", "motivational-interviewing"],
+  "suggestedBuyers": ["marcus-skeptical-vp", "gerald-hostile-cfo", "priya-warm-inbound"],
+  "repBrief": "You are interviewing for a senior account executive role at the buyer's company. The 'product' is you. Use true examples from your own experience. Goal: be invited to the next round.",
+  "buyerBrief": "Instead of buying software, you are interviewing the rep for a senior account executive role at your company. Keep your personality and mood. Ask about their experience, push for specifics and numbers, ask one uncomfortable question about a failure, and judge whether they would sell honestly to someone like you.",
+  "buyerOpensCall": true,
+  "phaseFocus": ["opener", "objectionHandling", "close"],
+  "winCondition": "The interviewer invites the candidate to the next round."
+}
